@@ -5,27 +5,27 @@
 <title>Sky Dreamers – Realtime Performance Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-:root {
+:root{
   --bg:#f4f6f8;
   --card:#ffffff;
   --text:#111;
   --muted:#6b7280;
   --primary:#2563eb;
   --border:#e5e7eb;
+  --glow:rgba(37,99,235,.35);
 }
-* { box-sizing:border-box; }
-body {
+*{box-sizing:border-box}
+body{
   margin:0;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family:Segoe UI,Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
-header {
+header{
   background:#fff;
   border-bottom:1px solid var(--border);
   padding:14px 22px;
@@ -33,101 +33,86 @@ header {
   justify-content:space-between;
   align-items:center;
 }
-header h1 {
-  font-size:20px;
-  margin:0;
-  font-weight:600;
-}
-.filters button {
+header h1{font-size:20px;margin:0;font-weight:600}
+.filters button{
   margin-left:6px;
   padding:6px 14px;
-  border-radius:20px;
+  border-radius:18px;
   border:1px solid var(--border);
   background:#fff;
   cursor:pointer;
   font-size:13px;
 }
-.filters button.active {
+.filters button.active{
   background:var(--primary);
   color:#fff;
   border-color:var(--primary);
 }
-.subtext {
-  padding:6px 22px;
-  font-size:12px;
-  color:var(--muted);
-}
-.container {
-  padding:16px 22px;
-}
+.container{padding:16px 22px}
 
-/* KPI CARDS */
-.cards {
+/* KPI */
+.cards{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:12px;
 }
-.card {
+.card{
   background:var(--card);
   border-radius:10px;
   padding:14px;
-  box-shadow:0 2px 6px rgba(0,0,0,.06);
   text-align:center;
+  box-shadow:0 0 0 rgba(0,0,0,0);
+  animation:glow 3s infinite;
 }
-.card h2 {
-  margin:0;
-  font-size:26px;
-}
-.card span {
-  font-size:12px;
-  color:var(--muted);
+.card h2{margin:0;font-size:26px}
+.card span{font-size:12px;color:var(--muted)}
+@keyframes glow{
+  0%{box-shadow:0 0 0 var(--glow)}
+  50%{box-shadow:0 0 14px var(--glow)}
+  100%{box-shadow:0 0 0 var(--glow)}
 }
 
-/* MAIN LAYOUT */
-.main {
+/* Layout */
+.main{
   display:grid;
-  grid-template-columns:3fr 1.2fr;
-  gap:18px;
+  grid-template-columns:2.2fr 1.4fr;
+  gap:16px;
   margin-top:18px;
 }
-
-/* TABLE */
-.section {
+.section{
   background:#fff;
   border-radius:10px;
   padding:14px;
   box-shadow:0 2px 6px rgba(0,0,0,.06);
 }
-.section h3 {
-  margin:0 0 10px;
-  font-size:16px;
-}
-table {
+.section h3{margin:0 0 10px;font-size:15px}
+
+/* Tables */
+table{
   width:100%;
   border-collapse:collapse;
-  font-size:13px;
+  font-size:12.5px;
 }
-th, td {
-  padding:8px;
+th,td{
+  padding:6px;
   border:1px solid #000;
   text-align:center;
 }
-th {
-  background:#fafafa;
-}
-td:first-child {
+th{background:#fafafa}
+td.name{
+  width:170px;
   text-align:left;
   font-weight:600;
 }
 
-/* STATES */
-.state {
-  padding:6px 0;
+/* States */
+.state{
+  padding:5px 0;
   border-bottom:1px solid var(--border);
-  font-size:13px;
+  font-size:12.5px;
 }
 
-footer {
+footer{
   text-align:center;
   font-size:11px;
   color:var(--muted);
@@ -148,120 +133,117 @@ footer {
   </div>
 </header>
 
-<div class="subtext">
-  Live shift view • Sorted by Qualified • Updates automatically
-</div>
-
 <div class="container">
 
-  <!-- KPI CARDS -->
-  <div class="cards">
-    <div class="card"><h2 id="submissions">0</h2><span>Submissions</span></div>
-    <div class="card"><h2 id="qualified">0</h2><span>Qualified</span></div>
-    <div class="card"><h2 id="notQualified">0</h2><span>Not Qualified</span></div>
-    <div class="card"><h2 id="pending">0</h2><span>Pending</span></div>
-    <div class="card"><h2 id="fph">0.00</h2><span>FPH</span></div>
-    <div class="card"><h2 id="sph">0.00</h2><span>SPH</span></div>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- AGENTS -->
-    <div class="section">
-      <h3>Agent Performance (Leaderboard)</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Agent</th>
-            <th>Subs</th>
-            <th>Qualified</th>
-            <th>Not Qual</th>
-            <th>FPH</th>
-            <th>SPH</th>
-            <th>Avg TT</th>
-            <th>Last Sub</th>
-          </tr>
-        </thead>
-        <tbody id="agentTable"></tbody>
-      </table>
-    </div>
-
-    <!-- STATES -->
-    <div class="section">
-      <h3>Live State Traffic</h3>
-      <div id="states"></div>
-    </div>
-
-  </div>
-
+<!-- KPI -->
+<div class="cards">
+  <div class="card"><h2 id="submissions">0</h2><span>Submissions</span></div>
+  <div class="card"><h2 id="qualified">0</h2><span>Qualified</span></div>
+  <div class="card"><h2 id="notQualified">0</h2><span>Not Qualified</span></div>
+  <div class="card"><h2 id="pending">0</h2><span>Pending</span></div>
+  <div class="card"><h2 id="fph">0.00</h2><span>FPH</span></div>
+  <div class="card"><h2 id="sph">0.00</h2><span>SPH</span></div>
 </div>
 
-<footer>
-  Sky Dreamers © 2025 • Real-time Operations View
-</footer>
+<div class="main">
+
+<!-- LEFT -->
+<div>
+  <div class="section">
+    <h3>Agent Performance (Leaderboard)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Agent</th><th>Subs</th><th>Qual</th><th>NQ</th>
+          <th>FPH</th><th>SPH</th><th>Avg TT</th><th>Last Sub</th>
+        </tr>
+      </thead>
+      <tbody id="agents"></tbody>
+    </table>
+  </div>
+
+  <div class="section" style="margin-top:14px">
+    <h3>Campaign Performance</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Campaign</th><th>Subs</th><th>Qual</th><th>NQ</th><th>FPH</th><th>SPH</th>
+        </tr>
+      </thead>
+      <tbody id="campaigns"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RIGHT -->
+<div class="section">
+  <h3>Live State Traffic</h3>
+  <div id="states"></div>
+</div>
+
+</div>
+</div>
+
+<footer>Sky Dreamers © 2025 • Operations Intelligence</footer>
 
 <script>
 firebase.initializeApp({
-  databaseURL: "https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
+  databaseURL:"https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
 });
+firebase.database().ref("dashboard").on("value",s=>{
+  const d=s.val(); if(!d) return;
 
-const db = firebase.database();
-
-db.ref("dashboard").on("value", snap => {
-  const d = snap.val();
-  if (!d) return;
-
-  document.getElementById("submissions").innerText = d.summary.submissions;
-  document.getElementById("qualified").innerText = d.summary.qualified;
-  document.getElementById("notQualified").innerText = d.summary.notQualified;
-  document.getElementById("pending").innerText = d.summary.pending;
-  document.getElementById("fph").innerText = d.summary.fph.toFixed(2);
-  document.getElementById("sph").innerText = d.summary.sph.toFixed(2);
+  submissions.innerText=d.summary.submissions;
+  qualified.innerText=d.summary.qualified;
+  notQualified.innerText=d.summary.notQualified;
+  pending.innerText=d.summary.pending;
+  fph.innerText=d.summary.fph.toFixed(2);
+  sph.innerText=d.summary.sph.toFixed(2);
 
   renderAgents(d.agents);
+  renderCampaigns(d.campaigns);
   renderStates(d.states);
 });
 
-function renderAgents(agents) {
-  const tbody = document.getElementById("agentTable");
-  tbody.innerHTML = "";
-
-  Object.entries(agents)
-    .sort((a,b)=>b[1].qualified-a[1].qualified)
-    .forEach(([name,a],i)=>{
-      const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":"";
-      tbody.innerHTML += `
-        <tr>
-          <td>${medal} ${name}</td>
-          <td>${a.submissions}</td>
-          <td>${a.qualified}</td>
-          <td>${a.notQualified}</td>
-          <td>${a.fph.toFixed(2)}</td>
-          <td>${a.sph.toFixed(2)}</td>
-          <td>${fmt(a.avgTalkTime)}</td>
-          <td>${time(a.lastSubmission)}</td>
-        </tr>`;
-    });
+function renderAgents(a){
+  agents.innerHTML="";
+  Object.entries(a).sort((x,y)=>y[1].qualified-x[1].qualified)
+  .forEach(([n,v],i)=>{
+    const m=i==0?"🥇":i==1?"🥈":i==2?"🥉":"";
+    agents.innerHTML+=`
+    <tr>
+      <td class="name">${m} ${n}</td>
+      <td>${v.submissions}</td>
+      <td>${v.qualified}</td>
+      <td>${v.notQualified}</td>
+      <td>${v.fph.toFixed(2)}</td>
+      <td>${v.sph.toFixed(2)}</td>
+      <td>${fmt(v.avgTalkTime)}</td>
+      <td>${time(v.lastSubmission)}</td>
+    </tr>`;
+  });
 }
-
-function renderStates(states) {
-  const div = document.getElementById("states");
-  div.innerHTML = "";
-  Object.entries(states)
-    .sort((a,b)=>b[1]-a[1])
-    .forEach(([s,c])=>{
-      div.innerHTML += `<div class="state">${s}: ${c}</div>`;
-    });
+function renderCampaigns(c){
+  campaigns.innerHTML="";
+  Object.entries(c).forEach(([n,v])=>{
+    campaigns.innerHTML+=`
+    <tr>
+      <td class="name">${n}</td>
+      <td>${v.submissions}</td>
+      <td>${v.qualified}</td>
+      <td>${v.notQualified}</td>
+      <td>${v.fph.toFixed(2)}</td>
+      <td>${v.sph.toFixed(2)}</td>
+    </tr>`;
+  });
 }
-
-function fmt(sec){
-  if(!sec) return "0:00";
-  return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`;
+function renderStates(s){
+  states.innerHTML="";
+  Object.entries(s).sort((a,b)=>b[1]-a[1])
+  .forEach(([k,v])=>states.innerHTML+=`<div class="state">${k}: ${v}</div>`);
 }
-function time(t){
-  return t ? new Date(t).toLocaleTimeString() : "--";
-}
+function fmt(sec){if(!sec)return"0:00";return`${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`}
+function time(t){return t?new Date(t).toLocaleTimeString():"--"}
 </script>
 
 </body>
