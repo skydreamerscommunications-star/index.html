@@ -1,59 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Sky Dreamers – Live Dashboard</title>
+  <meta charset="UTF-8" />
+  <title>Sky Dreamers – Realtime Performance Dashboard</title>
 
+  <!-- Firebase v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Tahoma, sans-serif;
       background: #f4f6f8;
+      margin: 0;
       padding: 20px;
+      color: #222;
     }
-    h1 { color: #2c3e50; }
-    pre {
-      background: #fff;
-      padding: 20px;
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .meta {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .controls button {
+      margin-left: 6px;
+      padding: 6px 12px;
       border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      max-height: 600px;
-      overflow: auto;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .controls button.active {
+      background: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+
+    .card .value {
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #000;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: bold;
+    }
+
+    tr.idle {
+      background: #ffe6e6;
+    }
+
+    .state {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 10px;
+      border-bottom: 1px solid #ddd;
     }
   </style>
 </head>
 
 <body>
 
-<h1>📊 Sky Dreamers – Live Firebase Data</h1>
-<p>Status: <span id="status">Connecting…</span></p>
+<div class="header">
+  <h1>Sky Dreamers – Realtime Performance Dashboard</h1>
 
-<pre id="output">Waiting for data…</pre>
+  <div class="controls">
+    <button class="active" onclick="setCampaign('ALL')">All</button>
+    <button onclick="setCampaign('MVA')">MVA</button>
+    <button onclick="setCampaign('Auto')">Auto</button>
+    <button onclick="setCampaign('Medicare')">Medicare</button>
+  </div>
+</div>
+
+<div class="meta">
+  Status: <span id="status">Connecting…</span> |
+  Last Updated: <span id="updated">--</span>
+</div>
+
+<div class="cards">
+  <div class="card"><div class="value" id="submissions">0</div>Submissions</div>
+  <div class="card"><div class="value" id="qualified">0</div>Qualified</div>
+  <div class="card"><div class="value" id="notQualified">0</div>Not Qualified</div>
+  <div class="card"><div class="value" id="pending">0</div>Pending</div>
+  <div class="card"><div class="value" id="fph">0</div>FPH</div>
+  <div class="card"><div class="value" id="sph">0</div>SPH</div>
+</div>
+
+<div class="layout">
+
+  <!-- MAIN TABLE -->
+  <div>
+    <h3 id="tableTitle">Agent Performance</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Subs</th>
+          <th>Qualified</th>
+          <th>Not Qual</th>
+          <th>FPH</th>
+          <th>SPH</th>
+          <th>Avg TT</th>
+          <th>Last Sub</th>
+        </tr>
+      </thead>
+      <tbody id="mainTable"></tbody>
+    </table>
+  </div>
+
+  <!-- STATES -->
+  <div>
+    <h3>State Traffic</h3>
+    <div id="states"></div>
+  </div>
+
+</div>
 
 <script>
-  const firebaseConfig = {
+  // 🔥 Firebase
+  firebase.initializeApp({
     databaseURL: "https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  db.ref("dashboard").on("value", snap => {
-    const data = snap.val();
-    if (!data) {
-      document.getElementById("status").textContent = "No data found";
-      return;
-    }
-
-    document.getElementById("status").textContent =
-      "Live – Last updated: " + new Date(data.lastUpdated).toLocaleTimeString();
-
-    document.getElementById("output").textContent =
-      JSON.stringify(data, null, 2);
   });
+
+  const db = firebase.database();
+  let currentCampaign = "ALL";
+  let dashboardData = null;
+
+  db.ref("dashboard/live").on("value", snap => {
+    dashboardData = snap.val();
+    if (!dashboardData) return;
+
+    document.getElementById("status").innerText = "LIVE";
+    document.getElementById("updated").innerText =
+      new Date(dashboardData.lastUpdated).toLocaleTimeString();
+
+    render();
+  });
+
+  function setCampaign(c) {
+    currentCampaign = c;
+    document.querySelectorAll(".controls button")
+      .forEach(b => b.classList.remove("active"));
+    event.target.classList.add("active");
+    render();
+  }
+
+  function render() {
+    renderCards();
+    renderTable();
+    renderStates();
+  }
+
+  function renderCards() {
+    const s = dashboardData.summary;
+    document.getElementById("submissions").innerText = s.submissions;
+    document.getElementById("qualified").innerText = s.qualified;
+    document.getElementById("notQualified").innerText = s.notQualified;
+    document.getElementById("pending").innerText = s.pending;
+    document.getElementById("fph").innerText = s.fph.toFixed(2);
+    document.getElementById("sph").innerText = s.sph.toFixed(2);
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("mainTable");
+    tbody.innerHTML = "";
+
+    const data = currentCampaign === "ALL"
+      ? dashboardData.agents
+      : Object.fromEntries(
+          Object.entries(dashboardData.agents)
+            .filter(([_, a]) => a.lastSubmission && true)
+        );
+
+    Object.entries(data).forEach(([name, a]) => {
+      const tr = document.createElement("tr");
+      if (a.idleMinutes >= 30) tr.classList.add("idle");
+
+      tr.innerHTML = `
+        <td>${name}</td>
+        <td>${a.submissions}</td>
+        <td>${a.qualified}</td>
+        <td>${a.notQualified}</td>
+        <td>${a.fph}</td>
+        <td>${a.sph}</td>
+        <td>${formatTT(a.avgTalkTime)}</td>
+        <td>${a.lastSubmission ? new Date(a.lastSubmission).toLocaleTimeString() : "--"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderStates() {
+    const div = document.getElementById("states");
+    div.innerHTML = "";
+    Object.entries(dashboardData.states).forEach(([s, c]) => {
+      div.innerHTML += `<div class="state"><b>${s}</b><span>${c}</span></div>`;
+    });
+  }
+
+  function formatTT(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }
 </script>
 
 </body>
 </html>
-
