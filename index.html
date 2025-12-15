@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers – Realtime Performance Dashboard</title>
+<title>Sky Dreamers – Live Performance Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -10,113 +10,155 @@
 
 <style>
 :root{
-  --bg:#f4f6f8;
-  --card:#ffffff;
-  --text:#111;
-  --muted:#6b7280;
-  --primary:#2563eb;
-  --border:#e5e7eb;
-  --glow:rgba(37,99,235,.35);
+  --bg:#0f172a;
+  --card:#111827;
+  --panel:#1f2933;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --blue:#3b82f6;
+  --green:#22c55e;
+  --red:#ef4444;
+  --yellow:#facc15;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Segoe UI,Arial,sans-serif;
-  background:var(--bg);
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:linear-gradient(135deg,#0f172a,#020617);
   color:var(--text);
 }
+
+/* HEADER */
 header{
-  background:#fff;
-  border-bottom:1px solid var(--border);
-  padding:14px 22px;
+  padding:16px 24px;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
-header h1{font-size:20px;margin:0;font-weight:600}
+header h1{
+  font-size:22px;
+  margin:0;
+  font-weight:700;
+}
 .filters button{
   margin-left:6px;
-  padding:6px 14px;
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:#fff;
+  padding:7px 16px;
+  border-radius:20px;
+  border:0;
+  background:#1f2937;
+  color:var(--text);
   cursor:pointer;
   font-size:13px;
 }
 .filters button.active{
-  background:var(--primary);
-  color:#fff;
-  border-color:var(--primary);
+  background:var(--blue);
 }
-.container{padding:16px 22px}
 
 /* KPI */
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px;
+  padding:0 24px;
 }
 .card{
-  background:var(--card);
-  border-radius:10px;
-  padding:14px;
+  border-radius:16px;
+  padding:16px;
   text-align:center;
-  box-shadow:0 0 0 rgba(0,0,0,0);
-  animation:glow 3s infinite;
+  position:relative;
+  overflow:hidden;
 }
-.card h2{margin:0;font-size:26px}
-.card span{font-size:12px;color:var(--muted)}
-@keyframes glow{
-  0%{box-shadow:0 0 0 var(--glow)}
-  50%{box-shadow:0 0 14px var(--glow)}
-  100%{box-shadow:0 0 0 var(--glow)}
+.card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at top,rgba(255,255,255,.15),transparent);
 }
+.card h2{
+  margin:0;
+  font-size:34px;
+  font-weight:800;
+}
+.card span{
+  font-size:12px;
+  color:var(--muted);
+  letter-spacing:.5px;
+}
+.kpi-sub{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+.kpi-qual{background:linear-gradient(135deg,#16a34a,#15803d)}
+.kpi-nq{background:linear-gradient(135deg,#dc2626,#991b1b)}
+.kpi-pend{background:linear-gradient(135deg,#ca8a04,#854d0e)}
+.kpi-fph{background:linear-gradient(135deg,#0ea5e9,#0369a1)}
+.kpi-sph{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
 
-/* Layout */
+/* MAIN */
 .main{
   display:grid;
-  grid-template-columns:2.2fr 1.4fr;
-  gap:16px;
-  margin-top:18px;
+  grid-template-columns:2.3fr 1fr;
+  gap:18px;
+  padding:20px 24px;
 }
-.section{
-  background:#fff;
-  border-radius:10px;
-  padding:14px;
-  box-shadow:0 2px 6px rgba(0,0,0,.06);
-}
-.section h3{margin:0 0 10px;font-size:15px}
 
-/* Tables */
+/* PANELS */
+.panel{
+  background:rgba(31,41,55,.85);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 10px 40px rgba(0,0,0,.4);
+}
+.panel h3{
+  margin:0 0 12px;
+  font-size:16px;
+  letter-spacing:.5px;
+}
+
+/* TABLES */
 table{
   width:100%;
   border-collapse:collapse;
-  font-size:12.5px;
+  font-size:13px;
 }
-th,td{
+th{
+  color:var(--muted);
+  font-weight:600;
   padding:6px;
-  border:1px solid #000;
+}
+td{
+  padding:8px 6px;
   text-align:center;
 }
-th{background:#fafafa}
 td.name{
-  width:170px;
   text-align:left;
-  font-weight:600;
+  font-weight:700;
+  white-space:nowrap;
 }
+tr{
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+tr.top1{background:rgba(34,197,94,.15)}
+tr.top2{background:rgba(59,130,246,.12)}
+tr.top3{background:rgba(250,204,21,.12)}
 
-/* States */
+/* STATES */
+.states{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(70px,1fr));
+  gap:8px;
+}
 .state{
-  padding:5px 0;
-  border-bottom:1px solid var(--border);
-  font-size:12.5px;
+  background:#020617;
+  border-radius:10px;
+  padding:8px;
+  text-align:center;
+  font-size:12px;
 }
 
+/* FOOTER */
 footer{
   text-align:center;
   font-size:11px;
   color:var(--muted);
-  padding:10px;
+  padding:12px;
 }
 </style>
 </head>
@@ -124,7 +166,7 @@ footer{
 <body>
 
 <header>
-  <h1>Sky Dreamers – Realtime Performance Dashboard</h1>
+  <h1>Sky Dreamers • Live Ops Leaderboard</h1>
   <div class="filters">
     <button class="active">All</button>
     <button>MVA</button>
@@ -133,65 +175,62 @@ footer{
   </div>
 </header>
 
-<div class="container">
-
 <!-- KPI -->
 <div class="cards">
-  <div class="card"><h2 id="submissions">0</h2><span>Submissions</span></div>
-  <div class="card"><h2 id="qualified">0</h2><span>Qualified</span></div>
-  <div class="card"><h2 id="notQualified">0</h2><span>Not Qualified</span></div>
-  <div class="card"><h2 id="pending">0</h2><span>Pending</span></div>
-  <div class="card"><h2 id="fph">0.00</h2><span>FPH</span></div>
-  <div class="card"><h2 id="sph">0.00</h2><span>SPH</span></div>
+  <div class="card kpi-sub"><h2 id="submissions">0</h2><span>SUBMISSIONS</span></div>
+  <div class="card kpi-qual"><h2 id="qualified">0</h2><span>QUALIFIED</span></div>
+  <div class="card kpi-nq"><h2 id="notQualified">0</h2><span>NOT QUALIFIED</span></div>
+  <div class="card kpi-pend"><h2 id="pending">0</h2><span>PENDING</span></div>
+  <div class="card kpi-fph"><h2 id="fph">0.00</h2><span>FPH</span></div>
+  <div class="card kpi-sph"><h2 id="sph">0.00</h2><span>SPH</span></div>
 </div>
 
 <div class="main">
 
-<!-- LEFT -->
-<div>
-  <div class="section">
-    <h3>Agent Performance (Leaderboard)</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Agent</th><th>Subs</th><th>Qual</th><th>NQ</th>
-          <th>FPH</th><th>SPH</th><th>Avg TT</th><th>Last Sub</th>
-        </tr>
-      </thead>
-      <tbody id="agents"></tbody>
-    </table>
-  </div>
+<!-- AGENTS -->
+<div class="panel">
+  <h3>🏆 Agent Leaderboard</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Agent</th><th>Subs</th><th>Qual</th><th>NQ</th><th>FPH</th><th>SPH</th><th>Avg TT</th>
+      </tr>
+    </thead>
+    <tbody id="agents"></tbody>
+  </table>
+</div>
 
-  <div class="section" style="margin-top:14px">
-    <h3>Campaign Performance</h3>
+<!-- RIGHT -->
+<div>
+  <div class="panel">
+    <h3>📊 Campaign Performance</h3>
     <table>
       <thead>
         <tr>
-          <th>Campaign</th><th>Subs</th><th>Qual</th><th>NQ</th><th>FPH</th><th>SPH</th>
+          <th>Campaign</th><th>Subs</th><th>Qual</th><th>FPH</th>
         </tr>
       </thead>
       <tbody id="campaigns"></tbody>
     </table>
   </div>
+
+  <div class="panel" style="margin-top:14px">
+    <h3>🗺️ Live State Traffic</h3>
+    <div class="states" id="states"></div>
+  </div>
 </div>
 
-<!-- RIGHT -->
-<div class="section">
-  <h3>Live State Traffic</h3>
-  <div id="states"></div>
 </div>
 
-</div>
-</div>
-
-<footer>Sky Dreamers © 2025 • Operations Intelligence</footer>
+<footer>Sky Dreamers © 2025 • Built for Winning Teams</footer>
 
 <script>
 firebase.initializeApp({
   databaseURL:"https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
 });
-firebase.database().ref("dashboard").on("value",s=>{
-  const d=s.val(); if(!d) return;
+
+firebase.database().ref("dashboard").on("value",snap=>{
+  const d=snap.val(); if(!d)return;
 
   submissions.innerText=d.summary.submissions;
   qualified.innerText=d.summary.qualified;
@@ -209,17 +248,16 @@ function renderAgents(a){
   agents.innerHTML="";
   Object.entries(a).sort((x,y)=>y[1].qualified-x[1].qualified)
   .forEach(([n,v],i)=>{
-    const m=i==0?"🥇":i==1?"🥈":i==2?"🥉":"";
+    const cls=i==0?"top1":i==1?"top2":i==2?"top3":"";
     agents.innerHTML+=`
-    <tr>
-      <td class="name">${m} ${n}</td>
+    <tr class="${cls}">
+      <td class="name">${i+1}. ${n}</td>
       <td>${v.submissions}</td>
       <td>${v.qualified}</td>
       <td>${v.notQualified}</td>
       <td>${v.fph.toFixed(2)}</td>
       <td>${v.sph.toFixed(2)}</td>
       <td>${fmt(v.avgTalkTime)}</td>
-      <td>${time(v.lastSubmission)}</td>
     </tr>`;
   });
 }
@@ -231,19 +269,18 @@ function renderCampaigns(c){
       <td class="name">${n}</td>
       <td>${v.submissions}</td>
       <td>${v.qualified}</td>
-      <td>${v.notQualified}</td>
       <td>${v.fph.toFixed(2)}</td>
-      <td>${v.sph.toFixed(2)}</td>
     </tr>`;
   });
 }
 function renderStates(s){
   states.innerHTML="";
   Object.entries(s).sort((a,b)=>b[1]-a[1])
-  .forEach(([k,v])=>states.innerHTML+=`<div class="state">${k}: ${v}</div>`);
+  .forEach(([k,v])=>{
+    states.innerHTML+=`<div class="state">${k}<br><b>${v}</b></div>`;
+  });
 }
 function fmt(sec){if(!sec)return"0:00";return`${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`}
-function time(t){return t?new Date(t).toLocaleTimeString():"--"}
 </script>
 
 </body>
