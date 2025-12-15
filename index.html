@@ -229,7 +229,7 @@ firebase.initializeApp({
   databaseURL:"https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
 });
 
-firebase.database().ref("dashboard").on("value",snap=>{
+firebase.database().ref("dashboard/live").on("value",snap=>{
   const d=snap.val(); if(!d)return;
 
   submissions.innerText=d.summary.submissions;
