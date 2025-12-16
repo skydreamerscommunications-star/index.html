@@ -2,19 +2,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • Realtime Performance Dashboard </title>
+<title>Sky Dreamers • Realtime Performance Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-/* --- BASE LIGHT THEME STYLES --- */
+/* --- DARK MODE THEME STYLES --- */
 body {
     margin: 0;
     font-family: Inter, Segoe UI, Arial, sans-serif;
-    background: #ffffff; 
-    color: #1f2937; 
+    background: #1f2937; /* Deep Navy Background */
+    color: #f3f4f6; /* Light Gray Text */
     min-height: 100vh;
 }
 header {
@@ -22,19 +22,20 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f9fafb; 
-    border-bottom: 3px solid #d1d5db; /* Thicker, defined bottom line */
+    background: #111827; /* Near Black Header */
+    border-bottom: 3px solid #374151; 
 }
 header h1 {
     margin: 0;
-    font-size: 26px; /* Slightly larger title */
+    font-size: 26px; 
     font-weight: 900;
+    color: #ffffff;
 }
 .time-info {
     text-align: right;
     font-size: 14px; 
     font-weight: 700;
-    color: #4b5563; 
+    color: #9ca3af; /* Subtle Gray */
 }
 .time-info span {
     display: block;
@@ -45,46 +46,47 @@ header h1 {
 .filters {
     display: flex;
     justify-content: center;
-    padding: 20px 16px; /* More padding for visual space */
+    padding: 20px 16px; 
     gap: 14px;
 }
 .filter-btn {
-    background: #e5e7eb;
-    color: #1f2937;
+    background: #374151; /* Darker neutral background */
+    color: #d1d5db;
     border: none;
     padding: 10px 20px;
-    border-radius: 25px; /* More rounded pill shape */
+    border-radius: 25px; 
     cursor: pointer;
     font-weight: 700;
     transition: all 0.2s ease;
 }
 .filter-btn:hover {
-    background: #d1d5db;
+    background: #4b5563;
     transform: translateY(-1px);
 }
 .filter-btn.active {
-    background: linear-gradient(135deg, #059669, #10b981); /* Deeper green gradient */
+    background: linear-gradient(135deg, #10b981, #059669); /* Green Accent */
     color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); /* Stronger glow */
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); 
 }
 
 /* --- HIGH-IMPACT SCORECARDS --- */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 18px; /* Slightly larger gap */
+    gap: 18px; 
     padding: 0 16px 20px;
 }
 .card {
-    border-radius: 16px; /* More rounded corners */
+    border-radius: 16px; 
     padding: 18px 8px;
     text-align: center;
     color: white; 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Stronger overall shadow */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow on dark mode */
+    background: #1f2937; /* Base dark color for fallback */
 }
 .card h2 {
     margin: 0;
-    font-size: 40px; /* Bigger numbers */
+    font-size: 40px; 
     font-weight: 900;
 }
 .card span {
@@ -95,28 +97,28 @@ header h1 {
     margin-top: 4px;
 }
 
-/* Specific Card Colors and Glows (Unchanged, as they look good) */
-#submissions-card { background: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5); } 
-#qualified-card { background: #10b981; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5); } 
-#notQualified-card { background: #ef4444; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5); } 
-#pending-card { background: #facc15; box-shadow: 0 4px 20px rgba(250, 204, 21, 0.5); color: #1f2937; } 
-#fph-card { background: #8b5cf6; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5); } 
-#sph-card { background: #f97316; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.5); } 
+/* Specific Card Colors and Glows (Colors are the focus, kept vibrant) */
+#submissions-card { background: #2563eb; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.6); } 
+#qualified-card { background: #059669; box-shadow: 0 4px 20px rgba(5, 150, 105, 0.6); } 
+#notQualified-card { background: #dc2626; box-shadow: 0 4px 20px rgba(220, 38, 38, 0.6); } 
+#pending-card { background: #facc15; box-shadow: 0 4px 20px rgba(250, 204, 21, 0.6); color: #1f2937; } /* Yellow always needs dark text */
+#fph-card { background: #7c3aed; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.6); } 
+#sph-card { background: #ea580c; box-shadow: 0 4px 20px rgba(234, 88, 12, 0.6); } 
 
 /* Main Layout and Panels */
 .main{
     display:grid;
-    grid-template-columns:2.5fr 1fr; /* Agents table slightly wider */
+    grid-template-columns:2.5fr 1fr; 
     gap:18px;
     padding: 0 16px 16px;
 }
 .panel{
-    background:#f9fafb; 
+    background:#2a3544; /* Panel Background (Lighter than body) */
     border-radius:14px;
     padding:14px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
-h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; }
+h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #4b5563; color: #ffffff; }
 
 /* --- Table Styling for Scrollable Body and Fixed Header --- */
 .table-container {
@@ -127,22 +129,22 @@ h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; }
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px; /* Slightly larger text in tables */
-    color: #1f2937;
+    font-size: 14px; 
+    color: #f3f4f6;
 }
 th, td {
-    padding: 10px 4px; /* Reduced vertical padding for density */
+    padding: 10px 4px; 
     text-align: center; 
-    border: 1px solid #e5e7eb; /* Lighter grid lines */
+    border: 1px solid #374151; /* Dark grid lines */
     font-weight: 700; 
 }
 th {
-    background: #e5e7eb; 
-    color: #1f2937;
+    background: #111827; /* Dark header background */
+    color: #ffffff;
     position: sticky; 
     top: 0; 
     z-index: 10; 
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow for fixed header */
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
 }
 td.name, th:first-child { 
     text-align: left; 
@@ -152,12 +154,18 @@ td.name, th:first-child {
 /* ACTIONABLE HEATMAP STYLES */
 .totals-row td {
     font-weight: 900 !important;
-    background: #d1fae5; 
-    color: #059669; 
-    border-top: 3px solid #059669; /* Thick separator for Totals */
+    background: #064e3b; /* Dark Green Total Bar */
+    color: #34d399; /* Light Green Text */
+    border-top: 3px solid #10b981; 
 }
 .top-performer {
-    background-color: #dcfce7; /* Vibrant light green highlight for FPH/SPH leaders */
+    /* Gradient Highlight for Dark Mode - High Motivation */
+    background: linear-gradient(90deg, #4c1d95, #1d4ed811); 
+    border-left: 5px solid #a78bfa; 
+    /* The first cell needs a different background */
+}
+.top-performer .name {
+    background: #4c1d95; /* Deep purple gradient start */
 }
 
 
@@ -168,13 +176,13 @@ td.name, th:first-child {
     right: -300px; 
     width: 250px;
     height: 100%;
-    background: #f9fafb;
-    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+    background: #2a3544; 
+    box-shadow: -8px 0 20px rgba(0, 0, 0, 0.8);
     transition: right 0.3s ease-in-out;
     padding: 16px;
     z-index: 1000;
     overflow-y: auto;
-    color: #1f2937;
+    color: #f3f4f6;
 }
 .sidebar.open {
     right: 0;
@@ -185,7 +193,7 @@ td.name, th:first-child {
     right: 10px;
     background: none;
     border: none;
-    color: #1f2937;
+    color: #f3f4f6;
     font-size: 20px;
     cursor: pointer;
 }
@@ -196,6 +204,7 @@ td.name, th:first-child {
 }
 .state-table th {
     text-align: left;
+    background: #2a3544;
 }
 .state-table td {
     text-align: right;
@@ -203,13 +212,13 @@ td.name, th:first-child {
 }
 
 footer{
-    background: #f9fafb; 
+    background: #111827; 
     text-align:center;
     font-size:12px;
     font-weight: 700;
     color:#6b7280;
     padding:12px;
-    border-top: 2px solid #e5e7eb;
+    border-top: 2px solid #374151;
 }
 </style>
 </head>
@@ -217,7 +226,7 @@ footer{
 <body>
 
 <header>
-    <h1>Sky Dreamers • High-Density Operations Hub</h1>
+    <h1>Sky Dreamers • Dark Mode Operations Hub</h1>
     <div class="time-info">
         <span id="lastSubmissionTime">Last Submission • N/A</span>
         <span id="lastRefreshedTime">Refreshed • N/A</span>
@@ -293,7 +302,7 @@ footer{
     </table>
 </div>
 
-<footer>Sky Dreamers • Eliminating Sheets, Driving Performance © 2025</footer>
+<footer>Sky Dreamers • Driving Performance & Eliminating Sheets © 2025</footer>
 
 <script>
 let dashboardData = null;
@@ -350,12 +359,10 @@ function calculateCampaignSummary(campaignName) {
 }
 
 function sortAgentsByQualified(agents) {
-    // Sort Z to A (Highest Qualified first)
     return Object.entries(agents).sort((a, b) => b[1].qualified - a[1].qualified);
 }
 
 function getTopFPHPerformers(agents, count = 3) {
-    // Identify top performers by FPH (efficiency)
     return Object.entries(agents)
         .filter(([n, v]) => v.submissions > 0) 
         .sort((a, b) => b[1].fph - a[1].fph)
@@ -425,8 +432,11 @@ function renderAgents(allAgents, summary, filter){
         const lastFormTimePKT = formatPKTTimeOnly(v.lastForm);
         const isTopPerformer = topPerformers.includes(n);
         
+        // Conditional class for the row
+        const rowClass = isTopPerformer ? 'top-performer' : '';
+
         tbody.innerHTML+=`
-            <tr class="${isTopPerformer ? 'top-performer' : ''}">
+            <tr class="${rowClass}">
                 <td class="name">${n}</td>
                 <td>${v.submissions}</td>
                 <td>${v.qualified}</td>
