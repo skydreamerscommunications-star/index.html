@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • Realtime Dashboard (Final)</title>
+<title>Sky Dreamers • High-Density Operations Hub</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -23,18 +23,18 @@ header {
     justify-content: space-between;
     align-items: center;
     background: #f9fafb; 
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 3px solid #d1d5db; /* Thicker, defined bottom line */
 }
 header h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 26px; /* Slightly larger title */
     font-weight: 900;
 }
 .time-info {
     text-align: right;
-    font-size: 13px; 
+    font-size: 14px; 
     font-weight: 700;
-    color: #4b5563; /* Professional neutral dark gray */
+    color: #4b5563; 
 }
 .time-info span {
     display: block;
@@ -45,56 +45,57 @@ header h1 {
 .filters {
     display: flex;
     justify-content: center;
-    padding: 16px;
-    gap: 12px;
+    padding: 20px 16px; /* More padding for visual space */
+    gap: 14px;
 }
 .filter-btn {
     background: #e5e7eb;
     color: #1f2937;
     border: none;
     padding: 10px 20px;
-    border-radius: 20px;
+    border-radius: 25px; /* More rounded pill shape */
     cursor: pointer;
     font-weight: 700;
-    transition: background-color 0.2s, box-shadow 0.2s;
+    transition: all 0.2s ease;
 }
 .filter-btn:hover {
     background: #d1d5db;
+    transform: translateY(-1px);
 }
 .filter-btn.active {
-    background: linear-gradient(135deg, #10b981, #059669); 
+    background: linear-gradient(135deg, #059669, #10b981); /* Deeper green gradient */
     color: white;
-    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); 
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); /* Stronger glow */
 }
 
 /* --- HIGH-IMPACT SCORECARDS --- */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 16px;
-    padding: 0 16px 16px;
+    gap: 18px; /* Slightly larger gap */
+    padding: 0 16px 20px;
 }
 .card {
-    border-radius: 14px;
-    padding: 16px 8px;
+    border-radius: 16px; /* More rounded corners */
+    padding: 18px 8px;
     text-align: center;
     color: white; 
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Stronger overall shadow */
 }
 .card h2 {
     margin: 0;
-    font-size: 38px;
+    font-size: 40px; /* Bigger numbers */
     font-weight: 900;
 }
 .card span {
-    font-size: 11px;
-    font-weight: 500;
-    opacity: 0.8;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.9;
     display: block;
     margin-top: 4px;
 }
 
-/* Specific Card Colors and Glows */
+/* Specific Card Colors and Glows (Unchanged, as they look good) */
 #submissions-card { background: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5); } 
 #qualified-card { background: #10b981; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5); } 
 #notQualified-card { background: #ef4444; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5); } 
@@ -105,8 +106,8 @@ header h1 {
 /* Main Layout and Panels */
 .main{
     display:grid;
-    grid-template-columns:2fr 1fr;
-    gap:16px;
+    grid-template-columns:2.5fr 1fr; /* Agents table slightly wider */
+    gap:18px;
     padding: 0 16px 16px;
 }
 .panel{
@@ -119,43 +120,44 @@ h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; }
 
 /* --- Table Styling for Scrollable Body and Fixed Header --- */
 .table-container {
-    max-height: 500px; /* Max height before scroll is initiated */
+    max-height: 500px; 
     overflow-y: auto;
-    position: relative; /* Needed for sticky header */
+    position: relative; 
 }
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 14px; /* Slightly larger text in tables */
     color: #1f2937;
 }
 th, td {
-    padding: 10px 6px; 
-    text-align: center; /* Ensures content is centered */
-    border: 1px solid #d1d5db; 
+    padding: 10px 4px; /* Reduced vertical padding for density */
+    text-align: center; 
+    border: 1px solid #e5e7eb; /* Lighter grid lines */
     font-weight: 700; 
 }
 th {
     background: #e5e7eb; 
     color: #1f2937;
-    position: sticky; /* Make header sticky */
-    top: 0; /* Stick to the top of the container */
-    z-index: 10; /* Ensure header is above rows */
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); /* Subtle shadow for fixed header */
 }
 td.name, th:first-child { 
-    text-align: left; /* Keep names left-aligned for readability */
+    text-align: left; 
     padding-left: 10px;
 }
 
-/* Special Row Styles */
+/* ACTIONABLE HEATMAP STYLES */
 .totals-row td {
     font-weight: 900 !important;
     background: #d1fae5; 
     color: #059669; 
-    border-top: 2px solid #059669;
+    border-top: 3px solid #059669; /* Thick separator for Totals */
 }
 .top-performer {
-    background-color: #ecfdf5; /* Light green highlight for FPH/SPH leaders */
+    background-color: #dcfce7; /* Vibrant light green highlight for FPH/SPH leaders */
 }
 
 
@@ -190,6 +192,7 @@ td.name, th:first-child {
 .state-table th, .state-table td {
     border: none;
     padding: 8px 4px;
+    font-weight: 700;
 }
 .state-table th {
     text-align: left;
@@ -214,7 +217,7 @@ footer{
 <body>
 
 <header>
-    <h1>Sky Dreamers • Operations Control Room</h1>
+    <h1>Sky Dreamers • High-Density Operations Hub</h1>
     <div class="time-info">
         <span id="lastSubmissionTime">Last Submission • N/A</span>
         <span id="lastRefreshedTime">Refreshed • N/A</span>
@@ -230,10 +233,10 @@ footer{
 </div>
 
 <div class="cards">
-    <div class="card" id="submissions-card"><h2 id="submissions">0</h2><span>Submissions</span></div>
-    <div class="card" id="qualified-card"><h2 id="qualified">0</h2><span>Qualified</span></div>
-    <div class="card" id="notQualified-card"><h2 id="notQualified">0</h2><span>Not Qualified</span></div>
-    <div class="card" id="pending-card"><h2 id="pending">0</h2><span>Pending</span></div>
+    <div class="card" id="submissions-card"><h2 id="submissions">0</h2><span>SUBMISSIONS</span></div>
+    <div class="card" id="qualified-card"><h2 id="qualified">0</h2><span>QUALIFIED</span></div>
+    <div class="card" id="notQualified-card"><h2 id="notQualified">0</h2><span>NOT QUALIFIED</span></div>
+    <div class="card" id="pending-card"><h2 id="pending">0</h2><span>PENDING</span></div>
     <div class="card" id="fph-card"><h2 id="fph">0.00</h2><span>FPH</span></div>
     <div class="card" id="sph-card"><h2 id="sph">0.00</h2><span>SPH</span></div>
 </div>
@@ -290,7 +293,7 @@ footer{
     </table>
 </div>
 
-<footer>Sky Dreamers • Operations Hub © 2025</footer>
+<footer>Sky Dreamers • Eliminating Sheets, Driving Performance © 2025</footer>
 
 <script>
 let dashboardData = null;
@@ -434,7 +437,7 @@ function renderAgents(allAgents, summary, filter){
             </tr>`;
     });
 
-    // Render Totals Row based on the filtered summary
+    // Render Totals Row with ALL metrics based on the filtered summary
     if (summary) {
         tfoot.innerHTML=`
             <tr class="totals-row">
@@ -511,7 +514,7 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
         
         if (campaign === undefined) return;
         
-        // Live Traffic button logic
+        // Live Traffic button logic (Sidebar toggle)
         if (campaign === 'Live Traffic') {
             openSidebar();
             return;
