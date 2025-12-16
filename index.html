@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • Realtime Dashboard (Final)</title>
+<title>Sky Dreamers • Operations Control Room</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -22,20 +22,23 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb; /* Consistent header background */
+    border-bottom: 2px solid #e5e7eb;
 }
 header h1 {
     margin: 0;
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 900;
 }
 .time-info {
     text-align: right;
-    font-size: 11px;
-    color: #6b7280; 
+    font-size: 13px; /* Slightly larger text */
+    font-weight: 700;
+    color: #374151;
 }
 .time-info span {
     display: block;
+    padding: 2px 0;
 }
 
 /* Campaign Filters */
@@ -52,7 +55,7 @@ header h1 {
     padding: 10px 20px;
     border-radius: 20px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
     transition: background-color 0.2s, box-shadow 0.2s;
 }
 .filter-btn:hover {
@@ -76,9 +79,8 @@ header h1 {
     border-radius: 14px;
     padding: 16px 8px;
     text-align: center;
-    color: white; /* Forced white text */
+    color: white; 
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
 }
 .card h2 {
     margin: 0;
@@ -94,12 +96,12 @@ header h1 {
 }
 
 /* Specific Card Colors and Glows */
-#submissions-card { background: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5); } /* Blue */
-#qualified-card { background: #10b981; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5); } /* Green */
-#notQualified-card { background: #ef4444; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5); } /* Red */
-#pending-card { background: #facc15; box-shadow: 0 4px 20px rgba(250, 204, 21, 0.5); color: #1f2937; } /* Yellow (dark text for contrast) */
-#fph-card { background: #8b5cf6; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5); } /* Purple */
-#sph-card { background: #f97316; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.5); } /* Orange */
+#submissions-card { background: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5); } 
+#qualified-card { background: #10b981; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5); } 
+#notQualified-card { background: #ef4444; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5); } 
+#pending-card { background: #facc15; box-shadow: 0 4px 20px rgba(250, 204, 21, 0.5); color: #1f2937; } 
+#fph-card { background: #8b5cf6; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5); } 
+#sph-card { background: #f97316; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.5); } 
 
 /* Main Layout and Panels */
 .main{
@@ -109,7 +111,7 @@ header h1 {
     padding: 0 16px 16px;
 }
 .panel{
-    background:#f9fafb; /* Lighter panel background */
+    background:#f9fafb; 
     border-radius:14px;
     padding:14px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -124,19 +126,19 @@ table{
 th,td{
     padding:10px 6px; 
     text-align:center;
-    border: 1px solid #e5e7eb; /* Classical border */
+    border: 1px solid #d1d5db; /* Classical border */
+    font-weight: 700; /* All table text bold */
 }
 th {
     background: #e5e7eb; 
     color: #1f2937;
-    font-weight: 700;
 }
-td.name{text-align:left;font-weight:600}
+td.name{text-align:left;font-weight:700}
 
 /* Special Row Styles */
 .totals-row td {
-    font-weight: 700;
-    background: #d1fae5; /* Very light green */
+    font-weight: 900 !important;
+    background: #d1fae5; 
     color: #059669; 
     border-top: 2px solid #059669;
 }
@@ -160,6 +162,9 @@ td.name{text-align:left;font-weight:600}
     overflow-y: auto;
     color: #1f2937;
 }
+.sidebar.open {
+    right: 0;
+}
 .sidebar-close-btn {
     position: absolute;
     top: 10px;
@@ -174,36 +179,22 @@ td.name{text-align:left;font-weight:600}
     border: none;
     padding: 8px 4px;
 }
-.state-table th:last-child, .state-table td:last-child {
+.state-table th {
+    text-align: left;
+}
+.state-table td {
     text-align: right;
-}
-.state-volume-cell {
-    position: relative;
-    padding: 8px 4px;
-    text-align: right;
-    font-weight: 700;
-}
-.state-volume-cell::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    background-color: #dbeafe; /* Blue heatmap base */
-    opacity: 0.8;
-    z-index: 0;
-    transition: width 0.3s;
-}
-.state-volume-cell span {
-    position: relative;
-    z-index: 1;
+    font-weight: 900;
 }
 
 footer{
+    background: #f9fafb; /* Consistent footer background */
     text-align:center;
-    font-size:11px;
-    color:#9ca3af;
+    font-size:12px;
+    font-weight: 700;
+    color:#6b7280;
     padding:12px;
+    border-top: 2px solid #e5e7eb;
 }
 </style>
 </head>
@@ -211,10 +202,10 @@ footer{
 <body>
 
 <header>
-    <h1>Sky Dreamers • Realtime Dashboard</h1>
+    <h1>Sky Dreamers • Operations Control Room</h1>
     <div class="time-info">
-        <span id="lastSubmissionTime">Last Submission • N/A</span>
-        <span id="lastRefreshedTime">Last Refreshed • N/A</span>
+        <span id="lastSubmissionTime" style="color: #ef4444;">Last Submission • N/A</span>
+        <span id="lastRefreshedTime" style="color: #10b981;">Last Refreshed • N/A</span>
     </div>
 </header>
 
@@ -262,21 +253,27 @@ footer{
                 <tfoot id="campaignsTotal"></tfoot>
             </table>
         </div>
+        
+        <div class="panel" style="margin-top: 16px;">
+            <h3>State Volume (Top Traffic)</h3>
+            <table class="state-table">
+                <thead>
+                    <tr><th>State</th><th>Volume</th></tr>
+                </thead>
+                <tbody id="statesBody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <div class="sidebar" id="liveTrafficSidebar">
     <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
-    <h3>Live Traffic (State Volume)</h3>
-    <table class="state-table">
-        <thead>
-            <tr><th>State</th><th>Volume</th></tr>
-        </thead>
-        <tbody id="statesBody"></tbody>
-    </table>
+    <h3>Live Traffic Focus</h3>
+    <p>This sidebar can be used for more detailed, focused information (e.g., individual agent time tracking, specific dialer metrics, etc.)</p>
+    <p>Currently, the State Volume is integrated into the main panel for better visibility.</p>
 </div>
 
-<footer>Sky Dreamers © 2025</footer>
+<footer>Sky Dreamers • Operations Hub © 2025</footer>
 
 <script>
 let dashboardData = null;
@@ -301,7 +298,6 @@ function formatPKTTime(isoString) {
     const formatter = new Intl.DateTimeFormat('en-US', options);
     const parts = formatter.formatToParts(pkDate);
     
-    // Default to the simplest format if parsing parts fails
     if (parts.length < 11) {
         return new Date(isoString).toLocaleString('en-US', { 
             hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Karachi' 
@@ -324,7 +320,8 @@ function formatPKTTimeOnly(isoString) {
     if (!isoString) return 'N/A';
     const fullPKT = formatPKTTime(isoString);
     const parts = fullPKT.split(' at ');
-    return parts.length > 1 ? parts[1] : 'N/A';
+    // Displays TIME only (e.g., 5:33 AM)
+    return parts.length > 1 ? parts[1] : 'N/A'; 
 }
 
 // --- Filtering and Utility Functions ---
@@ -334,12 +331,14 @@ function calculateCampaignSummary(campaignName) {
 }
 
 function sortAgentsByQualified(agents) {
+    // Sort Z to A (Highest Qualified first) for actionable insight
     return Object.entries(agents).sort((a, b) => b[1].qualified - a[1].qualified);
 }
 
 function getTopFPHPerformers(agents, count = 3) {
+    // Identify top performers by FPH (efficiency)
     return Object.entries(agents)
-        .filter(([n, v]) => v.submissions > 0) // Only include agents with submissions
+        .filter(([n, v]) => v.submissions > 0) 
         .sort((a, b) => b[1].fph - a[1].fph)
         .slice(0, count)
         .map(([n, v]) => n);
@@ -352,9 +351,9 @@ function renderDashboard(d){
     
     dashboardData = d; 
     
-    // Time Display Update
-    document.getElementById('lastRefreshedTime').innerText = `Last Refreshed • ${formatPKTTime(d.lastUpdated)}`;
-    document.getElementById('lastSubmissionTime').innerText = `Last Submission • ${formatPKTTime(d.lastSubmission) || 'N/A'}`;
+    // Time Display Update (Critical Insight)
+    document.getElementById('lastRefreshedTime').innerText = `Refreshed • ${formatPKTTime(d.lastUpdated)}`;
+    document.getElementById('lastSubmissionTime').innerText = `Submission • ${formatPKTTime(d.lastSubmission) || 'N/A'}`;
 
     renderAllPanels(currentFilter);
 }
@@ -368,7 +367,7 @@ function renderAllPanels(filter) {
         summaryData = calculateCampaignSummary(filter);
     }
 
-    // 1. Update Scorecards (Mandatory, as requested)
+    // 1. Update Scorecards
     if (summaryData) {
         submissions.innerText = summaryData.submissions;
         qualified.innerText = summaryData.qualified;
@@ -385,13 +384,13 @@ function renderAllPanels(filter) {
     }
 
     // 2. Render Agents Table
-    document.getElementById('agentsTitle').innerText = filter === 'All' ? 'Agents (All Campaigns)' : `Agents (Performance for ${filter})`;
+    document.getElementById('agentsTitle').innerText = filter === 'All' ? 'Agents (All Campaigns) - Sorted by QUALIFIED' : `Agents (Performance for ${filter}) - Sorted by QUALIFIED`;
     renderAgents(dashboardData.agents || {}, summaryData, filter);
     
     // 3. Render Campaigns Table
     renderCampaigns(dashboardData.campaigns || {}, dashboardData.summary); 
     
-    // 4. Render States Panel (Always shows all states)
+    // 4. Render States Panel (Integrated into the main panel)
     renderStates(dashboardData.states || {}); 
 }
 
@@ -472,25 +471,14 @@ function renderStates(s){
     tbody.innerHTML = "";
     
     let stateArray = Object.entries(s).map(([state, volume]) => ({ state, volume }));
+    // Sort Z to A (Highest Volume first)
     stateArray.sort((a, b) => b.volume - a.volume);
     
-    const maxVolume = stateArray.length > 0 ? stateArray[0].volume : 1; // Used for heatmap calculation
-
     stateArray.forEach(item => {
-        // Calculate intensity for heatmap effect
-        const intensity = (item.volume / maxVolume) * 100;
-        
         tbody.innerHTML+=`
             <tr>
-                <td>${item.state}</td>
-                <td class="state-volume-cell" style="width: 40%;">
-                    <span style="display: block;">${item.volume}</span>
-                    <style>
-                        #statesBody .state-volume-cell:last-child::before {
-                            width: ${intensity}%;
-                        }
-                    </style>
-                </td>
+                <td style="text-align:left;">${item.state}</td>
+                <td>${item.volume}</td>
             </tr>`;
     });
 }
@@ -508,11 +496,14 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
         
         if (campaign === undefined) return;
         
+        // FIX: The Live Traffic button now opens the sidebar correctly.
         if (campaign === 'Live Traffic') {
             openSidebar();
+            // Do NOT change the active button state or filter when opening the sidebar
             return;
         }
         
+        // Update active state for campaign buttons (excluding Live Traffic)
         document.querySelectorAll('.filter-btn').forEach(btn => {
             if (btn.dataset.campaign !== 'Live Traffic') {
                 btn.classList.remove('active');
@@ -520,6 +511,7 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
         });
         e.target.classList.add('active');
         
+        // Set new filter and re-render ALL panels
         currentFilter = campaign;
         if (dashboardData) {
             renderAllPanels(currentFilter);
