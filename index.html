@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • Professional Operations Hub</title>
+<title>Sky Dreamers • High-Energy Operations Hub</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -12,8 +12,8 @@
 /* --- BASE LIGHT THEME STYLES --- */
 body {
     margin: 0;
-    font-family: Arial, sans-serif; /* Professional, readable font */
-    background: #ffffff; 
+    font-family: Arial, sans-serif;
+    background: #f4f7f9; /* Off-White Body Background for Contrast */
     color: #1f2937; 
     min-height: 100vh;
 }
@@ -22,8 +22,9 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f9fafb; 
+    background: #ffffff; 
     border-bottom: 3px solid #e5e7eb; 
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); /* Subtle header shadow */
 }
 header h1 {
     margin: 0;
@@ -65,10 +66,10 @@ header h1 {
 .filter-btn.active {
     background: linear-gradient(135deg, #059669, #10b981); 
     color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); 
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); /* High-impact glow retained */
 }
 
-/* --- SCORECARDS --- */
+/* --- HIGH-ENERGY SCORECARDS --- */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -80,16 +81,18 @@ header h1 {
     padding: 18px 8px;
     text-align: center;
     color: white; 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-    background: white; /* Card background is now white */
-    border: 1px solid #e5e7eb;
+    border: none; /* Remove border for solid color/glow */
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
 }
 .card h2 {
     margin: 0;
     font-size: 40px; 
     font-weight: 900;
-    /* Use distinct colors for numbers */
-    color: inherit; 
+    color: white; /* All numbers are white for maximum contrast */
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 .card span {
     font-size: 12px;
@@ -97,15 +100,16 @@ header h1 {
     opacity: 0.9;
     display: block;
     margin-top: 4px;
+    color: white;
 }
 
-/* Specific Card Colors (Only for H2, span, and shadow) */
-#submissions-card h2, #submissions-card span { color: #3b82f6; } 
-#qualified-card h2, #qualified-card span { color: #10b981; } 
-#notQualified-card h2, #notQualified-card span { color: #ef4444; } 
-#pending-card h2, #pending-card span { color: #facc15; } 
-#fph-card h2, #fph-card span { color: #8b5cf6; } 
-#sph-card h2, #sph-card span { color: #f97316; } 
+/* Scorecard Backgrounds and Glows (Restoring full vibrant glow) */
+#submissions-card { background: #3b82f6; box-shadow: 0 8px 15px rgba(59, 130, 246, 0.5); } 
+#qualified-card { background: #10b981; box-shadow: 0 8px 15px rgba(16, 185, 129, 0.5); } 
+#notQualified-card { background: #ef4444; box-shadow: 0 8px 15px rgba(239, 68, 68, 0.5); } 
+#pending-card { background: #facc15; box-shadow: 0 8px 15px rgba(250, 204, 21, 0.5); } 
+#fph-card { background: #8b5cf6; box-shadow: 0 8px 15px rgba(139, 92, 246, 0.5); } 
+#sph-card { background: #f97316; box-shadow: 0 8px 15px rgba(249, 115, 22, 0.5); } 
 
 /* Main Layout and Panels */
 .main{
@@ -118,7 +122,7 @@ header h1 {
     background:#ffffff; 
     border-radius:14px;
     padding:14px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Clearer definition */
     border: 1px solid #e5e7eb;
 }
 h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #1f2937; }
@@ -132,14 +136,14 @@ h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px; 
+    font-size: 13px; /* Slightly smaller text for density */
     color: #1f2937;
 }
 th, td {
-    padding: 10px 4px; 
-    text-align: center; /* PERFECT CENTERING FOR NUMBERS */
+    padding: 8px 4px; /* Reduced vertical padding for density */
+    text-align: center; 
     border: 1px solid #e5e7eb; 
-    font-weight: 700; 
+    font-weight: 600; 
 }
 th {
     background: #f3f4f6; 
@@ -147,33 +151,28 @@ th {
     position: sticky; 
     top: 0; 
     z-index: 10; 
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.05); 
+    font-weight: 700;
 }
 td.name, th:first-child { 
-    text-align: left; /* Agent names MUST be left aligned */
+    text-align: left; 
     padding-left: 10px;
 }
 
-/* HEATMAP STYLES based on Top 5 Rank */
-/* Top 1-2 (Green) */
+/* HEATMAP STYLES based on Top 5 Rank (Clear and distinct) */
 .rank-green {
-    background-color: #dcfce7; 
+    background-color: #dcfce7; /* Light Green */
 }
 .rank-green:hover {
     background-color: #bbf7d0; 
 }
-
-/* Mid 3-4 (Yellow) */
 .rank-yellow {
-    background-color: #fef9c3; 
+    background-color: #fff9e6; /* Very Light Yellow */
 }
 .rank-yellow:hover {
-    background-color: #fde68a; 
+    background-color: #ffedb5; 
 }
-
-/* Lowest 5 (Red) */
 .rank-red {
-    background-color: #fee2e2; 
+    background-color: #fee2e2; /* Light Red */
 }
 .rank-red:hover {
     background-color: #fecaca;
@@ -182,29 +181,25 @@ td.name, th:first-child {
 /* TOTALS Row */
 .totals-row td {
     font-weight: 900 !important;
-    background: #cffafe; /* Light Teal Blue */
+    background: #cffafe; 
     color: #06b6d4; 
     border-top: 3px solid #06b6d4; 
 }
-
 
 /* --- Live Traffic Sidebar (State Volume) --- */
 .sidebar {
     position: fixed;
     top: 0;
     right: -300px; 
-    width: 280px; /* Slightly wider */
+    width: 280px; 
     height: 100%;
-    background: #f9fafb;
+    background: #ffffff;
     box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
     transition: right 0.3s ease-in-out;
     padding: 16px;
     z-index: 1000;
     overflow-y: auto;
     color: #1f2937;
-}
-.sidebar.open {
-    right: 0;
 }
 .sidebar-close-btn {
     position: absolute;
@@ -216,31 +211,26 @@ td.name, th:first-child {
     font-size: 24px;
     cursor: pointer;
 }
-.state-table {
-    width: 100%;
-    border-collapse: collapse;
-}
 .state-table th, .state-table td {
-    border: 1px solid #d1d5db; /* Add borders */
+    border: 1px solid #d1d5db; 
     padding: 10px;
     font-weight: 700;
-    font-size: 14px; /* Larger text */
+    font-size: 14px; 
     text-align: center;
 }
 .state-table th {
     background: #e5e7eb;
 }
-.state-table td:first-child { /* State names left-aligned */
+.state-table td:first-child { 
     text-align: left;
-    font-weight: 900;
+    font-weight: 600;
 }
-.state-table td:last-child { /* Volume centered/right-aligned */
-    text-align: center;
+.state-table td:last-child { 
     font-weight: 900;
 }
 
 footer{
-    background: #f9fafb; 
+    background: #ffffff; 
     text-align:center;
     font-size:12px;
     font-weight: 700;
@@ -254,7 +244,7 @@ footer{
 <body>
 
 <header>
-    <h1>Sky Dreamers • Professional Operations Hub</h1>
+    <h1>Sky Dreamers • High-Energy Operations Hub</h1>
     <div class="time-info">
         <span id="lastSubmissionTime">Last Submission • N/A</span>
         <span id="lastRefreshedTime">Refreshed • N/A</span>
@@ -391,20 +381,13 @@ function sortAgentsByQualified(agents) {
     return Object.entries(agents).sort((a, b) => b[1].qualified - a[1].qualified);
 }
 
-function getTopFPHPerformers(agents, count = 3) {
-    return Object.entries(agents)
-        .filter(([n, v]) => v.submissions > 0) 
-        .sort((a, b) => b[1].fph - a[1].fph)
-        .slice(0, count)
-        .map(([n, v]) => n);
-}
-
 // --- Rendering Functions ---
 
 function getHeatmapClass(rank) {
-    if (rank <= 2) return 'rank-green';     // Top 1-2
-    if (rank <= 4) return 'rank-yellow';    // Mid 3-4
-    if (rank === 5) return 'rank-red';      // Lowest 5
+    // Logic based on Top 5 (Qualified Submissions)
+    if (rank <= 2) return 'rank-green';     // Rank 1-2 (Top)
+    if (rank <= 4) return 'rank-yellow';    // Rank 3-4 (Mid)
+    if (rank === 5) return 'rank-red';      // Rank 5 (Lowest of Top 5)
     return '';
 }
 
@@ -438,8 +421,7 @@ function renderAllPanels(filter) {
         fph.innerText = summaryData.fph.toFixed(2);
         sph.innerText = summaryData.sph.toFixed(2);
         
-        // Conditional color for pending text
-        document.getElementById('pending-card').style.color = summaryData.pending > 0 ? '#facc15' : '#1f2937';
+        // Remove individual color change as the card color/glow is now the priority
     } else {
         submissions.innerText = qualified.innerText = notQualified.innerText = pending.innerText = '0';
         fph.innerText = sph.innerText = '0.00';
@@ -461,6 +443,7 @@ function renderAgents(allAgents, summary, filter){
     const tfoot = document.getElementById('agentsTotal');
     tbody.innerHTML = "";
     
+    // Get agents and sort by QUALIFIED for heatmap ranking
     const sortedAgents = sortAgentsByQualified(allAgents);
     
     // Render agent rows
