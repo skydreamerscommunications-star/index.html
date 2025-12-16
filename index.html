@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • High-Energy Operations Hub</title>
+<title>Sky Dreamers • Realtime Performance Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -17,25 +17,32 @@ body {
     color: #1f2937; 
     min-height: 100vh;
 }
+
+/* --- DARK BLUE HEADER/FOOTER CONSISTENCY --- */
+header, footer {
+    background: #1f3a5f; /* Deep Dark Blue */
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+}
 header {
     padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #ffffff; 
-    border-bottom: 3px solid #e5e7eb; 
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05); /* Subtle header shadow */
+    border-bottom: 3px solid #3b5998; 
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); 
 }
 header h1 {
     margin: 0;
     font-size: 26px; 
     font-weight: 900;
+    color: #ffffff;
 }
 .time-info {
     text-align: right;
-    font-size: 14px; 
-    font-weight: 700;
-    color: #4b5563; 
+    font-size: 16px; /* Slightly larger text for time */
+    font-weight: 900;
 }
 .time-info span {
     display: block;
@@ -66,7 +73,7 @@ header h1 {
 .filter-btn.active {
     background: linear-gradient(135deg, #059669, #10b981); 
     color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); /* High-impact glow retained */
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); 
 }
 
 /* --- HIGH-ENERGY SCORECARDS --- */
@@ -81,7 +88,6 @@ header h1 {
     padding: 18px 8px;
     text-align: center;
     color: white; 
-    border: none; /* Remove border for solid color/glow */
     transition: transform 0.2s;
 }
 .card:hover {
@@ -91,7 +97,7 @@ header h1 {
     margin: 0;
     font-size: 40px; 
     font-weight: 900;
-    color: white; /* All numbers are white for maximum contrast */
+    color: white; 
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 .card span {
@@ -103,7 +109,7 @@ header h1 {
     color: white;
 }
 
-/* Scorecard Backgrounds and Glows (Restoring full vibrant glow) */
+/* Scorecard Backgrounds and Glows */
 #submissions-card { background: #3b82f6; box-shadow: 0 8px 15px rgba(59, 130, 246, 0.5); } 
 #qualified-card { background: #10b981; box-shadow: 0 8px 15px rgba(16, 185, 129, 0.5); } 
 #notQualified-card { background: #ef4444; box-shadow: 0 8px 15px rgba(239, 68, 68, 0.5); } 
@@ -122,25 +128,25 @@ header h1 {
     background:#ffffff; 
     border-radius:14px;
     padding:14px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Clearer definition */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
     border: 1px solid #e5e7eb;
 }
 h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #1f2937; }
 
 /* --- Table Styling for Scrollable Body and Fixed Header --- */
 .table-container {
-    max-height: 500px; 
+    max-height: 400px; /* Adjusted for density */
     overflow-y: auto;
     position: relative; 
 }
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px; /* Slightly smaller text for density */
+    font-size: 13px; 
     color: #1f2937;
 }
 th, td {
-    padding: 8px 4px; /* Reduced vertical padding for density */
+    padding: 8px 4px; /* High Density Padding */
     text-align: center; 
     border: 1px solid #e5e7eb; 
     font-weight: 600; 
@@ -158,25 +164,10 @@ td.name, th:first-child {
     padding-left: 10px;
 }
 
-/* HEATMAP STYLES based on Top 5 Rank (Clear and distinct) */
-.rank-green {
-    background-color: #dcfce7; /* Light Green */
-}
-.rank-green:hover {
-    background-color: #bbf7d0; 
-}
-.rank-yellow {
-    background-color: #fff9e6; /* Very Light Yellow */
-}
-.rank-yellow:hover {
-    background-color: #ffedb5; 
-}
-.rank-red {
-    background-color: #fee2e2; /* Light Red */
-}
-.rank-red:hover {
-    background-color: #fecaca;
-}
+/* FULL AGENT HEATMAP STYLES */
+.rank-green { background-color: #dcfce7; } 
+.rank-yellow { background-color: #fff9e6; } 
+.rank-red { background-color: #fee2e2; } 
 
 /* TOTALS Row */
 .totals-row td {
@@ -200,6 +191,9 @@ td.name, th:first-child {
     z-index: 1000;
     overflow-y: auto;
     color: #1f2937;
+}
+.sidebar.open {
+    right: 0;
 }
 .sidebar-close-btn {
     position: absolute;
@@ -230,13 +224,47 @@ td.name, th:first-child {
 }
 
 footer{
-    background: #ffffff; 
-    text-align:center;
-    font-size:12px;
-    font-weight: 700;
-    color:#6b7280;
     padding:12px;
-    border-top: 2px solid #e5e7eb;
+    text-align:center;
+    border-top: 2px solid #3b5998;
+}
+
+/* New State Submissions Mini Panel */
+.state-mini-panel {
+    margin-top: 18px;
+    padding: 14px;
+    background: #ffffff; 
+    border-radius:14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+    border: 1px solid #e5e7eb;
+}
+.state-mini-panel h4 {
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d1d5db;
+    font-size: 16px;
+    color: #1f2937;
+}
+.state-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 8px;
+    padding-top: 10px;
+}
+.state-item {
+    text-align: center;
+    padding: 6px 0;
+    border-radius: 6px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    font-size: 12px;
+    font-weight: 700;
+}
+.state-item span {
+    display: block;
+    font-size: 16px;
+    font-weight: 900;
+    color: #3b82f6;
 }
 </style>
 </head>
@@ -244,10 +272,9 @@ footer{
 <body>
 
 <header>
-    <h1>Sky Dreamers • High-Energy Operations Hub</h1>
+    <h1>Sky Dreamers • High-Performance Operations Hub</h1>
     <div class="time-info">
-        <span id="lastSubmissionTime">Last Submission • N/A</span>
-        <span id="lastRefreshedTime">Refreshed • N/A</span>
+        <span id="lastSubmissionTime">LAST SUBMISSION • N/A</span>
     </div>
 </header>
 
@@ -306,6 +333,13 @@ footer{
                 <tfoot id="campaignsTotal"></tfoot>
             </table>
         </div>
+
+        <div class="state-mini-panel">
+            <h4>Top State Submissions (All Time)</h4>
+            <div class="state-grid" id="topStatesBody">
+                </div>
+        </div>
+
     </div>
 </div>
 
@@ -326,6 +360,7 @@ footer{
 let dashboardData = null;
 let currentFilter = 'All';
 
+// Initialize Firebase
 firebase.initializeApp({
     databaseURL:"https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
 });
@@ -335,26 +370,12 @@ firebase.initializeApp({
 function formatPKTTime(isoString) {
     if (!isoString) return 'N/A';
     const date = new Date(isoString);
-    const offsetPKT = 5 * 60 * 60 * 1000;
-    const pkDate = new Date(date.getTime() + offsetPKT);
-    
-    const options = { 
+    // Setting timezone to PKT (UTC+5)
+    const pkDate = date.toLocaleString('en-US', {
         year: '2-digit', month: '2-digit', day: '2-digit',
-        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC'
-    };
-    const formatter = new Intl.DateTimeFormat('en-US', options);
-    const parts = formatter.formatToParts(pkDate);
-    
-    if (parts.length < 11) {
-        return new Date(isoString).toLocaleString('en-US', { 
-            hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Karachi' 
-        });
-    }
-
-    const datePart = `${parts[2].value}/${parts[0].value}/${parts[4].value}`;
-    const timePart = `${parts[6].value}:${parts[8].value} ${parts[10].value}`; 
-
-    return `${datePart} at ${timePart}`;
+        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Karachi'
+    });
+    return pkDate;
 }
 
 function fmt(sec){
@@ -365,9 +386,10 @@ function fmt(sec){
 
 function formatPKTTimeOnly(isoString) {
     if (!isoString) return 'N/A';
-    const fullPKT = formatPKTTime(isoString);
-    const parts = fullPKT.split(' at ');
-    return parts.length > 1 ? parts[1] : 'N/A'; 
+    // Setting timezone to PKT (UTC+5) for time only
+    return new Date(isoString).toLocaleString('en-US', {
+        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Karachi'
+    });
 }
 
 // --- Filtering and Utility Functions ---
@@ -383,12 +405,16 @@ function sortAgentsByQualified(agents) {
 
 // --- Rendering Functions ---
 
-function getHeatmapClass(rank) {
-    // Logic based on Top 5 (Qualified Submissions)
-    if (rank <= 2) return 'rank-green';     // Rank 1-2 (Top)
-    if (rank <= 4) return 'rank-yellow';    // Rank 3-4 (Mid)
-    if (rank === 5) return 'rank-red';      // Rank 5 (Lowest of Top 5)
-    return '';
+function getHeatmapClass(rank, totalAgents) {
+    if (totalAgents === 0) return '';
+    
+    // Calculate cutoff points for Green (Top 33%), Yellow (Mid 33%), Red (Bottom 34%)
+    const greenCutoff = Math.ceil(totalAgents * 0.33);
+    const yellowCutoff = Math.ceil(totalAgents * 0.66); // Covers up to 66%
+    
+    if (rank <= greenCutoff) return 'rank-green';     
+    if (rank <= yellowCutoff) return 'rank-yellow';    
+    return 'rank-red'; // Everything else (Bottom 34%)
 }
 
 function renderDashboard(d){
@@ -396,9 +422,8 @@ function renderDashboard(d){
     
     dashboardData = d; 
     
-    // Time Display Update
-    document.getElementById('lastRefreshedTime').innerText = `Refreshed • ${formatPKTTime(d.lastUpdated)}`;
-    document.getElementById('lastSubmissionTime').innerText = `Submission • ${formatPKTTime(d.lastSubmission) || 'N/A'}`;
+    // Time Display Update (Only Last Submission)
+    document.getElementById('lastSubmissionTime').innerText = `LAST SUBMISSION • ${formatPKTTime(d.lastSubmission) || 'N/A'}`;
 
     renderAllPanels(currentFilter);
 }
@@ -420,8 +445,6 @@ function renderAllPanels(filter) {
         pending.innerText = summaryData.pending;
         fph.innerText = summaryData.fph.toFixed(2);
         sph.innerText = summaryData.sph.toFixed(2);
-        
-        // Remove individual color change as the card color/glow is now the priority
     } else {
         submissions.innerText = qualified.innerText = notQualified.innerText = pending.innerText = '0';
         fph.innerText = sph.innerText = '0.00';
@@ -436,6 +459,9 @@ function renderAllPanels(filter) {
     
     // 4. Render States Panel (Renders into the sidebar)
     renderStates(dashboardData.states || {}); 
+
+    // 5. Render Top States Mini Panel
+    renderTopStatesMini(dashboardData.states || {});
 }
 
 function renderAgents(allAgents, summary, filter){
@@ -443,13 +469,13 @@ function renderAgents(allAgents, summary, filter){
     const tfoot = document.getElementById('agentsTotal');
     tbody.innerHTML = "";
     
-    // Get agents and sort by QUALIFIED for heatmap ranking
     const sortedAgents = sortAgentsByQualified(allAgents);
+    const totalAgents = sortedAgents.length;
     
     // Render agent rows
     sortedAgents.forEach(([n, v], index) => {
         const lastFormTimePKT = formatPKTTimeOnly(v.lastForm);
-        const rankClass = getHeatmapClass(index + 1);
+        const rankClass = getHeatmapClass(index + 1, totalAgents);
         
         tbody.innerHTML+=`
             <tr class="${rankClass}">
@@ -527,11 +553,34 @@ function renderStates(s){
     });
 }
 
+function renderTopStatesMini(s) {
+    const grid = document.getElementById('topStatesBody');
+    grid.innerHTML = "";
+
+    let stateArray = Object.entries(s).map(([state, volume]) => ({ state, volume }));
+    stateArray.sort((a, b) => b.volume - a.volume);
+    
+    // Limit to top 6 states for the mini panel
+    stateArray.slice(0, 6).forEach(item => {
+        grid.innerHTML += `
+            <div class="state-item">
+                <span>${item.volume}</span>
+                ${item.state}
+            </div>
+        `;
+    });
+}
+
 
 // --- Event Handlers and Listeners ---
 
+// Firebase Listener
 firebase.database().ref("dashboard/live").on("value", snap => {
-    renderDashboard(snap.val());
+    const data = snap.val();
+    if (data) {
+        dashboardData = data; // Update global data
+        renderDashboard(data);
+    }
 });
 
 document.getElementById('campaignFilters').addEventListener('click', (e) => {
