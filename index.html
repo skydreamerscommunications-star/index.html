@@ -2,19 +2,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • Realtime Dashboard</title>
+<title>Sky Dreamers • Realtime Dashboard (Final)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-/* --- LIGHT THEME STYLES --- */
+/* --- BASE LIGHT THEME STYLES --- */
 body {
     margin: 0;
     font-family: Inter, Segoe UI, Arial;
-    background: #ffffff; /* White background */
-    color: #1f2937; /* Dark text */
+    background: #ffffff; 
+    color: #1f2937; 
     min-height: 100vh;
 }
 header {
@@ -22,16 +22,17 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #e5e7eb;
 }
 header h1 {
     margin: 0;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
 }
 .time-info {
     text-align: right;
     font-size: 11px;
-    color: #6b7280; /* Muted dark gray */
+    color: #6b7280; 
 }
 .time-info span {
     display: block;
@@ -41,78 +42,79 @@ header h1 {
 .filters {
     display: flex;
     justify-content: center;
-    padding: 0 16px 16px;
-    gap: 10px;
+    padding: 16px;
+    gap: 12px;
 }
 .filter-btn {
-    background: #e5e7eb; /* Light gray button */
-    color: #1f2937; /* Dark text */
-    border: 1px solid #d1d5db;
-    padding: 8px 16px;
-    border-radius: 8px;
+    background: #e5e7eb;
+    color: #1f2937;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
     cursor: pointer;
     font-weight: 600;
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: background-color 0.2s, box-shadow 0.2s;
 }
 .filter-btn:hover {
     background: #d1d5db;
 }
 .filter-btn.active {
-    background: linear-gradient(135deg, #10b981, #059669); /* Green gradient */
-    border-color: #059669;
+    background: linear-gradient(135deg, #10b981, #059669); 
     color: white;
-    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); /* Glow effect */
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); 
 }
 
 
-/* Summary Cards */
+/* --- HIGH-IMPACT SCORECARDS --- */
 .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 14px;
-    padding: 0 16px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    padding: 0 16px 16px;
 }
 .card {
-    background: #f3f4f6; /* Very light gray card */
     border-radius: 14px;
-    padding: 16px;
+    padding: 16px 8px;
     text-align: center;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Soft shadow */
-    transition: box-shadow 0.3s;
+    color: white; /* Forced white text */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
 }
-.card h2{
-    margin:0;
-    font-size:32px;
-    color: #3b82f6; /* Default Blue for numbers */
+.card h2 {
+    margin: 0;
+    font-size: 38px;
+    font-weight: 900;
 }
-.card span{
-    font-size:12px;
-    color: #6b7280;
+.card span {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.8;
+    display: block;
+    margin-top: 4px;
 }
-/* Glowing Scorecards */
-#fph.metric-value, #sph.metric-value {
-    color: #3b82f6; /* Set default text color to blue for FPH/SPH */
-}
-#submissions, #qualified { color: #10b981; } /* Green for core metrics */
-#notQualified, #pending { color: #ef4444; } /* Red for negative metrics */
 
+/* Specific Card Colors and Glows */
+#submissions-card { background: #3b82f6; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5); } /* Blue */
+#qualified-card { background: #10b981; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5); } /* Green */
+#notQualified-card { background: #ef4444; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5); } /* Red */
+#pending-card { background: #facc15; box-shadow: 0 4px 20px rgba(250, 204, 21, 0.5); color: #1f2937; } /* Yellow (dark text for contrast) */
+#fph-card { background: #8b5cf6; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5); } /* Purple */
+#sph-card { background: #f97316; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.5); } /* Orange */
 
 /* Main Layout and Panels */
 .main{
     display:grid;
     grid-template-columns:2fr 1fr;
     gap:16px;
-    padding:16px;
+    padding: 0 16px 16px;
 }
 .panel{
-    background:#f3f4f6;
+    background:#f9fafb; /* Lighter panel background */
     border-radius:14px;
     padding:14px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
-h3 { margin-top: 0; }
+h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; }
 table{
     width:100%;
     border-collapse:collapse;
@@ -120,44 +122,43 @@ table{
     color: #1f2937;
 }
 th,td{
-    padding:8px 6px; 
+    padding:10px 6px; 
     text-align:center;
-    border: 1px solid #d1d5db; /* Light grid lines/borders */
+    border: 1px solid #e5e7eb; /* Classical border */
 }
 th {
-    background: #e5e7eb; /* Slightly darker header */
+    background: #e5e7eb; 
     color: #1f2937;
+    font-weight: 700;
 }
-td.name{text-align:left;font-weight:700}
+td.name{text-align:left;font-weight:600}
+
+/* Special Row Styles */
 .totals-row td {
     font-weight: 700;
-    background: #d1d5db; /* Darker row for totals */
-    color: #059669; /* Darker Green color for totals */
+    background: #d1fae5; /* Very light green */
+    color: #059669; 
     border-top: 2px solid #059669;
 }
+.top-performer {
+    background-color: #ecfdf5; /* Light green highlight for FPH/SPH leaders */
+}
+
 
 /* Live Traffic Sidebar */
 .sidebar {
     position: fixed;
     top: 0;
-    right: -300px; /* Hidden off-screen */
+    right: -300px; 
     width: 250px;
     height: 100%;
-    background: #f3f4f6; /* Light gray sidebar */
+    background: #f9fafb;
     box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
     transition: right 0.3s ease-in-out;
     padding: 16px;
     z-index: 1000;
     overflow-y: auto;
     color: #1f2937;
-}
-.sidebar.open {
-    right: 0;
-}
-.sidebar h3 {
-    border-bottom: 1px solid #d1d5db;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
 }
 .sidebar-close-btn {
     position: absolute;
@@ -171,8 +172,31 @@ td.name{text-align:left;font-weight:700}
 }
 .state-table th, .state-table td {
     border: none;
-    padding: 6px 4px;
-    text-align: left;
+    padding: 8px 4px;
+}
+.state-table th:last-child, .state-table td:last-child {
+    text-align: right;
+}
+.state-volume-cell {
+    position: relative;
+    padding: 8px 4px;
+    text-align: right;
+    font-weight: 700;
+}
+.state-volume-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #dbeafe; /* Blue heatmap base */
+    opacity: 0.8;
+    z-index: 0;
+    transition: width 0.3s;
+}
+.state-volume-cell span {
+    position: relative;
+    z-index: 1;
 }
 
 footer{
@@ -203,12 +227,12 @@ footer{
 </div>
 
 <div class="cards">
-    <div class="card"><h2 id="submissions">0</h2><span>Submissions</span></div>
-    <div class="card"><h2 id="qualified">0</h2><span>Qualified</span></div>
-    <div class="card"><h2 id="notQualified">0</h2><span>Not Qualified</span></div>
-    <div class="card"><h2 id="pending">0</h2><span>Pending</span></div>
-    <div class="card"><h2 id="fph" class="metric-value">0.00</h2><span>FPH</span></div>
-    <div class="card"><h2 id="sph" class="metric-value">0.00</h2><span>SPH</span></div>
+    <div class="card" id="submissions-card"><h2 id="submissions">0</h2><span>Submissions</span></div>
+    <div class="card" id="qualified-card"><h2 id="qualified">0</h2><span>Qualified</span></div>
+    <div class="card" id="notQualified-card"><h2 id="notQualified">0</h2><span>Not Qualified</span></div>
+    <div class="card" id="pending-card"><h2 id="pending">0</h2><span>Pending</span></div>
+    <div class="card" id="fph-card"><h2 id="fph">0.00</h2><span>FPH</span></div>
+    <div class="card" id="sph-card"><h2 id="sph">0.00</h2><span>SPH</span></div>
 </div>
 
 <div class="main">
@@ -217,7 +241,7 @@ footer{
         <table>
             <thead>
                 <tr>
-                    <th>Agent</th><th>Subs</th><th>Qualified</th><th>FPH</th><th>SPH</th><th>Avg TT</th><th>Last Form</th>
+                    <th>Agent</th><th>Subs</th><th>Qual</th><th>FPH</th><th>SPH</th><th>Avg TT</th><th>Last Form</th>
                 </tr>
             </thead>
             <tbody id="agentsBody"></tbody>
@@ -231,7 +255,7 @@ footer{
             <table>
                 <thead>
                     <tr>
-                        <th>Camp</th><th>Subs</th><th>Qualified</th><th>FPH</th>
+                        <th>Camp</th><th>Subs</th><th>Qual</th><th>FPH</th>
                     </tr>
                 </thead>
                 <tbody id="campaignsBody"></tbody>
@@ -255,77 +279,49 @@ footer{
 <footer>Sky Dreamers © 2025</footer>
 
 <script>
-// Global data store
 let dashboardData = null;
-let currentFilter = 'All'; // 'All', 'Auto', 'MVA', or 'Medicare'
-
-// Temporary object to simulate campaign-specific summary data (since backend only sends overall summary)
-// In a real application, the backend would calculate this, but we'll do it on the client for now.
-let campaignSummaries = {}; 
+let currentFilter = 'All';
 
 firebase.initializeApp({
     databaseURL:"https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
 });
 
-// --- Timezone and Formatting Helpers ---
+// --- Formatting Helpers ---
 
-/**
- * Converts an ISO string (UTC-like) to a formatted date/time string in PKT (UTC+5).
- * @param {string} isoString 
- * @returns {string} Formatted PKT time string (e.g., "12/16/25 at 6:30 PM")
- */
 function formatPKTTime(isoString) {
     if (!isoString) return 'N/A';
-    
     const date = new Date(isoString);
-    
-    // PKT is UTC+5. We calculate the milliseconds needed to shift from UTC to PKT.
     const offsetPKT = 5 * 60 * 60 * 1000;
-    
-    // Create a new Date object representing the time in PKT
     const pkDate = new Date(date.getTime() + offsetPKT);
     
-    // Use a fixed format for display
-    const formatter = new Intl.DateTimeFormat('en-US', {
-        year: '2-digit',
-        month: '2-digit',
-        day: '2-digit',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'UTC' // The formatter treats pkDate (which is already PKT shifted) as UTC
-    });
-    
+    const options = { 
+        year: '2-digit', month: '2-digit', day: '2-digit',
+        hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC'
+    };
+    const formatter = new Intl.DateTimeFormat('en-US', options);
     const parts = formatter.formatToParts(pkDate);
     
-    // Check if the format is consistent before trying to parse parts
+    // Default to the simplest format if parsing parts fails
     if (parts.length < 11) {
-        // Fallback for simple time if full date formatting is complex
-        const options = { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Karachi' };
-        return new Date(isoString).toLocaleString('en-US', options);
+        return new Date(isoString).toLocaleString('en-US', { 
+            hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Karachi' 
+        });
     }
-    
+
     const datePart = `${parts[2].value}/${parts[0].value}/${parts[4].value}`;
     const timePart = `${parts[6].value}:${parts[8].value} ${parts[10].value}`; 
 
     return `${datePart} at ${timePart}`;
 }
 
-/**
- * Formats seconds into M:SS format.
- */
 function fmt(sec){
     if(sec === undefined || sec === null) return "0:00";
     sec = Math.round(sec); 
     return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0");
 }
 
-/**
- * Formats a timestamp to just HH:MM AM/PM PKT for the Last Form column.
- */
 function formatPKTTimeOnly(isoString) {
     if (!isoString) return 'N/A';
-    
     const fullPKT = formatPKTTime(isoString);
     const parts = fullPKT.split(' at ');
     return parts.length > 1 ? parts[1] : 'N/A';
@@ -333,22 +329,21 @@ function formatPKTTimeOnly(isoString) {
 
 // --- Filtering and Utility Functions ---
 
-/**
- * Calculates a summary object for a given campaign. 
- * NOTE: This relies on the agent stats having the same metrics as the summary.
- */
 function calculateCampaignSummary(campaignName) {
-    const summary = dashboardData.campaigns[campaignName];
-    if (!summary) return null;
-    
-    // The backend provides the summary for the campaigns, so we just return it.
-    // The total Avg Talk Time needs to be calculated manually if not provided (but it is)
-    // The final summary structure is:
-    // {avgTalkTime, callback, conversion, fph, notQualified, pending, qualified, sph, submissions}
-    
-    return summary;
+    return dashboardData.campaigns[campaignName] || null;
 }
 
+function sortAgentsByQualified(agents) {
+    return Object.entries(agents).sort((a, b) => b[1].qualified - a[1].qualified);
+}
+
+function getTopFPHPerformers(agents, count = 3) {
+    return Object.entries(agents)
+        .filter(([n, v]) => v.submissions > 0) // Only include agents with submissions
+        .sort((a, b) => b[1].fph - a[1].fph)
+        .slice(0, count)
+        .map(([n, v]) => n);
+}
 
 // --- Rendering Functions ---
 
@@ -357,27 +352,23 @@ function renderDashboard(d){
     
     dashboardData = d; 
     
-    // 1. Time Display Update (PKT Fix)
-    lastRefreshedTime.innerText = `Last Refreshed • ${formatPKTTime(d.lastUpdated)}`;
-    lastSubmissionTime.innerText = `Last Submission • ${formatPKTTime(d.lastSubmission) || 'N/A'}`;
+    // Time Display Update
+    document.getElementById('lastRefreshedTime').innerText = `Last Refreshed • ${formatPKTTime(d.lastUpdated)}`;
+    document.getElementById('lastSubmissionTime').innerText = `Last Submission • ${formatPKTTime(d.lastSubmission) || 'N/A'}`;
 
-    // 2. Render all panels based on the current filter
     renderAllPanels(currentFilter);
 }
 
 function renderAllPanels(filter) {
     let summaryData;
-    let agentsTitle;
 
     if (filter === 'All') {
         summaryData = dashboardData.summary;
-        agentsTitle = 'Agents (All Campaigns)';
     } else {
         summaryData = calculateCampaignSummary(filter);
-        agentsTitle = `Agents (Performance for ${filter})`;
     }
 
-    // 1. Update Scorecards
+    // 1. Update Scorecards (Mandatory, as requested)
     if (summaryData) {
         submissions.innerText = summaryData.submissions;
         qualified.innerText = summaryData.qualified;
@@ -385,21 +376,22 @@ function renderAllPanels(filter) {
         pending.innerText = summaryData.pending;
         fph.innerText = summaryData.fph.toFixed(2);
         sph.innerText = summaryData.sph.toFixed(2);
+        
+        // Handle pending text color for contrast on yellow background
+        document.getElementById('pending-card').style.color = summaryData.pending > 0 ? '#1f2937' : 'white';
     } else {
-        // If no data for a filtered campaign (e.g., MVA), show zeros
         submissions.innerText = qualified.innerText = notQualified.innerText = pending.innerText = '0';
         fph.innerText = sph.innerText = '0.00';
     }
 
-
     // 2. Render Agents Table
-    document.getElementById('agentsTitle').innerText = agentsTitle;
+    document.getElementById('agentsTitle').innerText = filter === 'All' ? 'Agents (All Campaigns)' : `Agents (Performance for ${filter})`;
     renderAgents(dashboardData.agents || {}, summaryData, filter);
     
-    // 3. Render Campaigns Table (Always shows all campaigns for context)
+    // 3. Render Campaigns Table
     renderCampaigns(dashboardData.campaigns || {}, dashboardData.summary); 
     
-    // 4. Render States (Always shows all states)
+    // 4. Render States Panel (Always shows all states)
     renderStates(dashboardData.states || {}); 
 }
 
@@ -408,21 +400,16 @@ function renderAgents(allAgents, summary, filter){
     const tfoot = document.getElementById('agentsTotal');
     tbody.innerHTML = "";
     
-    // Filter agents: This requires the backend to send agent stats PER campaign.
-    // Since it doesn't, the agents table will always display the ALL Campaigns stats (most logical fallback)
-    // or we only show agents who contributed to the campaign (if we had a map).
-    
-    // For now, we render the full list but use the filtered summary for the totals row.
-    let agentsToRender = allAgents;
+    const sortedAgents = sortAgentsByQualified(allAgents);
+    const topPerformers = getTopFPHPerformers(allAgents);
 
     // Render agent rows
-    Object.entries(agentsToRender).forEach(([n,v])=>{
-        
-        // Get the agent's last form time and format only the TIME part (HH:MM AM/PM)
+    sortedAgents.forEach(([n, v]) => {
         const lastFormTimePKT = formatPKTTimeOnly(v.lastForm);
+        const isTopPerformer = topPerformers.includes(n);
         
         tbody.innerHTML+=`
-            <tr>
+            <tr class="${isTopPerformer ? 'top-performer' : ''}">
                 <td class="name">${n}</td>
                 <td>${v.submissions}</td>
                 <td>${v.qualified}</td>
@@ -437,8 +424,7 @@ function renderAgents(allAgents, summary, filter){
     if (summary) {
         tfoot.innerHTML=`
             <tr class="totals-row">
-                <td class="name">${filter === 'All' ? 'TOTALS (All)' : `TOTALS (${filter})`}</td>
-                <td>${summary.submissions}</td>
+                <td class="name" style="text-align:center;" colspan="2">TOTALS (${filter})</td>
                 <td>${summary.qualified}</td>
                 <td>${summary.fph.toFixed(2)}</td>
                 <td>${summary.sph.toFixed(2)}</td>
@@ -455,7 +441,6 @@ function renderCampaigns(c, summary){
     const tfoot = document.getElementById('campaignsTotal');
     tbody.innerHTML = "";
     
-    // Campaign table is always displayed using the full summary for context
     let totalSubs = 0;
     let totalQual = 0;
     
@@ -475,7 +460,7 @@ function renderCampaigns(c, summary){
     // Render Totals Row
     tfoot.innerHTML=`
         <tr class="totals-row">
-            <td class="name">TOTALS</td>
+            <td class="name" style="text-align:center;">TOTALS</td>
             <td>${totalSubs}</td>
             <td>${totalQual}</td>
             <td>${summary.fph.toFixed(2)}</td>
@@ -489,25 +474,34 @@ function renderStates(s){
     let stateArray = Object.entries(s).map(([state, volume]) => ({ state, volume }));
     stateArray.sort((a, b) => b.volume - a.volume);
     
+    const maxVolume = stateArray.length > 0 ? stateArray[0].volume : 1; // Used for heatmap calculation
+
     stateArray.forEach(item => {
+        // Calculate intensity for heatmap effect
+        const intensity = (item.volume / maxVolume) * 100;
+        
         tbody.innerHTML+=`
             <tr>
                 <td>${item.state}</td>
-                <td>${item.volume}</td>
+                <td class="state-volume-cell" style="width: 40%;">
+                    <span style="display: block;">${item.volume}</span>
+                    <style>
+                        #statesBody .state-volume-cell:last-child::before {
+                            width: ${intensity}%;
+                        }
+                    </style>
+                </td>
             </tr>`;
     });
 }
 
 
-// --- Event Handlers ---
+// --- Event Handlers and Listeners ---
 
-// Firebase Listener
 firebase.database().ref("dashboard/live").on("value", snap => {
-    // Campaign filtering happens here on initial load, and on button click
     renderDashboard(snap.val());
 });
 
-// Campaign Filter Buttons
 document.getElementById('campaignFilters').addEventListener('click', (e) => {
     if (e.target.classList.contains('filter-btn')) {
         const campaign = e.target.dataset.campaign;
@@ -519,7 +513,6 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
             return;
         }
         
-        // 1. Update active state for campaign buttons (excluding Live Traffic)
         document.querySelectorAll('.filter-btn').forEach(btn => {
             if (btn.dataset.campaign !== 'Live Traffic') {
                 btn.classList.remove('active');
@@ -527,7 +520,6 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
         });
         e.target.classList.add('active');
         
-        // 2. Set new filter and re-render ALL panels
         currentFilter = campaign;
         if (dashboardData) {
             renderAllPanels(currentFilter);
@@ -535,7 +527,6 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
     }
 });
 
-// Live Traffic Sidebar Handlers
 function openSidebar() {
     document.getElementById('liveTrafficSidebar').classList.add('open');
 }
