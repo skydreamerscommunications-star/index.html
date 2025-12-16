@@ -2,19 +2,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • Realtime Performance Dashboard</title>
+<title>Sky Dreamers • Professional Operations Hub</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-/* --- DARK MODE THEME STYLES --- */
+/* --- BASE LIGHT THEME STYLES --- */
 body {
     margin: 0;
-    font-family: Inter, Segoe UI, Arial, sans-serif;
-    background: #1f2937; /* Deep Navy Background */
-    color: #f3f4f6; /* Light Gray Text */
+    font-family: Arial, sans-serif; /* Professional, readable font */
+    background: #ffffff; 
+    color: #1f2937; 
     min-height: 100vh;
 }
 header {
@@ -22,20 +22,19 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #111827; /* Near Black Header */
-    border-bottom: 3px solid #374151; 
+    background: #f9fafb; 
+    border-bottom: 3px solid #e5e7eb; 
 }
 header h1 {
     margin: 0;
     font-size: 26px; 
     font-weight: 900;
-    color: #ffffff;
 }
 .time-info {
     text-align: right;
     font-size: 14px; 
     font-weight: 700;
-    color: #9ca3af; /* Subtle Gray */
+    color: #4b5563; 
 }
 .time-info span {
     display: block;
@@ -50,8 +49,8 @@ header h1 {
     gap: 14px;
 }
 .filter-btn {
-    background: #374151; /* Darker neutral background */
-    color: #d1d5db;
+    background: #e5e7eb;
+    color: #1f2937;
     border: none;
     padding: 10px 20px;
     border-radius: 25px; 
@@ -60,16 +59,16 @@ header h1 {
     transition: all 0.2s ease;
 }
 .filter-btn:hover {
-    background: #4b5563;
+    background: #d1d5db;
     transform: translateY(-1px);
 }
 .filter-btn.active {
-    background: linear-gradient(135deg, #10b981, #059669); /* Green Accent */
+    background: linear-gradient(135deg, #059669, #10b981); 
     color: white;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.6); 
 }
 
-/* --- HIGH-IMPACT SCORECARDS --- */
+/* --- SCORECARDS --- */
 .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -81,13 +80,16 @@ header h1 {
     padding: 18px 8px;
     text-align: center;
     color: white; 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow on dark mode */
-    background: #1f2937; /* Base dark color for fallback */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+    background: white; /* Card background is now white */
+    border: 1px solid #e5e7eb;
 }
 .card h2 {
     margin: 0;
     font-size: 40px; 
     font-weight: 900;
+    /* Use distinct colors for numbers */
+    color: inherit; 
 }
 .card span {
     font-size: 12px;
@@ -97,13 +99,13 @@ header h1 {
     margin-top: 4px;
 }
 
-/* Specific Card Colors and Glows (Colors are the focus, kept vibrant) */
-#submissions-card { background: #2563eb; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.6); } 
-#qualified-card { background: #059669; box-shadow: 0 4px 20px rgba(5, 150, 105, 0.6); } 
-#notQualified-card { background: #dc2626; box-shadow: 0 4px 20px rgba(220, 38, 38, 0.6); } 
-#pending-card { background: #facc15; box-shadow: 0 4px 20px rgba(250, 204, 21, 0.6); color: #1f2937; } /* Yellow always needs dark text */
-#fph-card { background: #7c3aed; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.6); } 
-#sph-card { background: #ea580c; box-shadow: 0 4px 20px rgba(234, 88, 12, 0.6); } 
+/* Specific Card Colors (Only for H2, span, and shadow) */
+#submissions-card h2, #submissions-card span { color: #3b82f6; } 
+#qualified-card h2, #qualified-card span { color: #10b981; } 
+#notQualified-card h2, #notQualified-card span { color: #ef4444; } 
+#pending-card h2, #pending-card span { color: #facc15; } 
+#fph-card h2, #fph-card span { color: #8b5cf6; } 
+#sph-card h2, #sph-card span { color: #f97316; } 
 
 /* Main Layout and Panels */
 .main{
@@ -113,12 +115,13 @@ header h1 {
     padding: 0 16px 16px;
 }
 .panel{
-    background:#2a3544; /* Panel Background (Lighter than body) */
+    background:#ffffff; 
     border-radius:14px;
     padding:14px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
 }
-h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #4b5563; color: #ffffff; }
+h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; color: #1f2937; }
 
 /* --- Table Styling for Scrollable Body and Fixed Header --- */
 .table-container {
@@ -130,59 +133,75 @@ table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px; 
-    color: #f3f4f6;
+    color: #1f2937;
 }
 th, td {
     padding: 10px 4px; 
-    text-align: center; 
-    border: 1px solid #374151; /* Dark grid lines */
+    text-align: center; /* PERFECT CENTERING FOR NUMBERS */
+    border: 1px solid #e5e7eb; 
     font-weight: 700; 
 }
 th {
-    background: #111827; /* Dark header background */
-    color: #ffffff;
+    background: #f3f4f6; 
+    color: #1f2937;
     position: sticky; 
     top: 0; 
     z-index: 10; 
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.05); 
 }
 td.name, th:first-child { 
-    text-align: left; 
+    text-align: left; /* Agent names MUST be left aligned */
     padding-left: 10px;
 }
 
-/* ACTIONABLE HEATMAP STYLES */
+/* HEATMAP STYLES based on Top 5 Rank */
+/* Top 1-2 (Green) */
+.rank-green {
+    background-color: #dcfce7; 
+}
+.rank-green:hover {
+    background-color: #bbf7d0; 
+}
+
+/* Mid 3-4 (Yellow) */
+.rank-yellow {
+    background-color: #fef9c3; 
+}
+.rank-yellow:hover {
+    background-color: #fde68a; 
+}
+
+/* Lowest 5 (Red) */
+.rank-red {
+    background-color: #fee2e2; 
+}
+.rank-red:hover {
+    background-color: #fecaca;
+}
+
+/* TOTALS Row */
 .totals-row td {
     font-weight: 900 !important;
-    background: #064e3b; /* Dark Green Total Bar */
-    color: #34d399; /* Light Green Text */
-    border-top: 3px solid #10b981; 
-}
-.top-performer {
-    /* Gradient Highlight for Dark Mode - High Motivation */
-    background: linear-gradient(90deg, #4c1d95, #1d4ed811); 
-    border-left: 5px solid #a78bfa; 
-    /* The first cell needs a different background */
-}
-.top-performer .name {
-    background: #4c1d95; /* Deep purple gradient start */
+    background: #cffafe; /* Light Teal Blue */
+    color: #06b6d4; 
+    border-top: 3px solid #06b6d4; 
 }
 
 
-/* --- Live Traffic Sidebar --- */
+/* --- Live Traffic Sidebar (State Volume) --- */
 .sidebar {
     position: fixed;
     top: 0;
     right: -300px; 
-    width: 250px;
+    width: 280px; /* Slightly wider */
     height: 100%;
-    background: #2a3544; 
-    box-shadow: -8px 0 20px rgba(0, 0, 0, 0.8);
+    background: #f9fafb;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
     transition: right 0.3s ease-in-out;
     padding: 16px;
     z-index: 1000;
     overflow-y: auto;
-    color: #f3f4f6;
+    color: #1f2937;
 }
 .sidebar.open {
     right: 0;
@@ -193,32 +212,41 @@ td.name, th:first-child {
     right: 10px;
     background: none;
     border: none;
-    color: #f3f4f6;
-    font-size: 20px;
+    color: #1f2937;
+    font-size: 24px;
     cursor: pointer;
 }
+.state-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 .state-table th, .state-table td {
-    border: none;
-    padding: 8px 4px;
+    border: 1px solid #d1d5db; /* Add borders */
+    padding: 10px;
     font-weight: 700;
+    font-size: 14px; /* Larger text */
+    text-align: center;
 }
 .state-table th {
-    text-align: left;
-    background: #2a3544;
+    background: #e5e7eb;
 }
-.state-table td {
-    text-align: right;
+.state-table td:first-child { /* State names left-aligned */
+    text-align: left;
+    font-weight: 900;
+}
+.state-table td:last-child { /* Volume centered/right-aligned */
+    text-align: center;
     font-weight: 900;
 }
 
 footer{
-    background: #111827; 
+    background: #f9fafb; 
     text-align:center;
     font-size:12px;
     font-weight: 700;
     color:#6b7280;
     padding:12px;
-    border-top: 2px solid #374151;
+    border-top: 2px solid #e5e7eb;
 }
 </style>
 </head>
@@ -226,7 +254,7 @@ footer{
 <body>
 
 <header>
-    <h1>Sky Dreamers • Dark Mode Operations Hub</h1>
+    <h1>Sky Dreamers • Professional Operations Hub</h1>
     <div class="time-info">
         <span id="lastSubmissionTime">Last Submission • N/A</span>
         <span id="lastRefreshedTime">Refreshed • N/A</span>
@@ -359,6 +387,7 @@ function calculateCampaignSummary(campaignName) {
 }
 
 function sortAgentsByQualified(agents) {
+    // Sort Z to A (Highest Qualified first)
     return Object.entries(agents).sort((a, b) => b[1].qualified - a[1].qualified);
 }
 
@@ -371,6 +400,13 @@ function getTopFPHPerformers(agents, count = 3) {
 }
 
 // --- Rendering Functions ---
+
+function getHeatmapClass(rank) {
+    if (rank <= 2) return 'rank-green';     // Top 1-2
+    if (rank <= 4) return 'rank-yellow';    // Mid 3-4
+    if (rank === 5) return 'rank-red';      // Lowest 5
+    return '';
+}
 
 function renderDashboard(d){
     if (!d || !d.summary) return;
@@ -402,7 +438,8 @@ function renderAllPanels(filter) {
         fph.innerText = summaryData.fph.toFixed(2);
         sph.innerText = summaryData.sph.toFixed(2);
         
-        document.getElementById('pending-card').style.color = summaryData.pending > 0 ? '#1f2937' : 'white';
+        // Conditional color for pending text
+        document.getElementById('pending-card').style.color = summaryData.pending > 0 ? '#facc15' : '#1f2937';
     } else {
         submissions.innerText = qualified.innerText = notQualified.innerText = pending.innerText = '0';
         fph.innerText = sph.innerText = '0.00';
@@ -425,18 +462,14 @@ function renderAgents(allAgents, summary, filter){
     tbody.innerHTML = "";
     
     const sortedAgents = sortAgentsByQualified(allAgents);
-    const topPerformers = getTopFPHPerformers(allAgents);
-
+    
     // Render agent rows
-    sortedAgents.forEach(([n, v]) => {
+    sortedAgents.forEach(([n, v], index) => {
         const lastFormTimePKT = formatPKTTimeOnly(v.lastForm);
-        const isTopPerformer = topPerformers.includes(n);
+        const rankClass = getHeatmapClass(index + 1);
         
-        // Conditional class for the row
-        const rowClass = isTopPerformer ? 'top-performer' : '';
-
         tbody.innerHTML+=`
-            <tr class="${rowClass}">
+            <tr class="${rankClass}">
                 <td class="name">${n}</td>
                 <td>${v.submissions}</td>
                 <td>${v.qualified}</td>
@@ -505,7 +538,7 @@ function renderStates(s){
     stateArray.forEach(item => {
         tbody.innerHTML+=`
             <tr>
-                <td style="text-align:left;">${item.state}</td>
+                <td>${item.state}</td>
                 <td>${item.volume}</td>
             </tr>`;
     });
