@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sky Dreamers • Operations Control Room</title>
+<title>Sky Dreamers • Operations Control Room (Final)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -12,7 +12,7 @@
 /* --- BASE LIGHT THEME STYLES --- */
 body {
     margin: 0;
-    font-family: Inter, Segoe UI, Arial;
+    font-family: Inter, Segoe UI, Arial, sans-serif;
     background: #ffffff; 
     color: #1f2937; 
     min-height: 100vh;
@@ -22,7 +22,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f9fafb; /* Consistent header background */
+    background: #f9fafb; 
     border-bottom: 2px solid #e5e7eb;
 }
 header h1 {
@@ -32,9 +32,9 @@ header h1 {
 }
 .time-info {
     text-align: right;
-    font-size: 13px; /* Slightly larger text */
+    font-size: 13px; 
     font-weight: 700;
-    color: #374151;
+    color: #4b5563; /* Professional neutral dark gray */
 }
 .time-info span {
     display: block;
@@ -66,7 +66,6 @@ header h1 {
     color: white;
     box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); 
 }
-
 
 /* --- HIGH-IMPACT SCORECARDS --- */
 .cards {
@@ -117,23 +116,36 @@ header h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #d1d5db; }
-table{
-    width:100%;
-    border-collapse:collapse;
-    font-size:13px;
+
+/* --- Table Styling for Scrollable Body and Fixed Header --- */
+.table-container {
+    max-height: 500px; /* Max height before scroll is initiated */
+    overflow-y: auto;
+    position: relative; /* Needed for sticky header */
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
     color: #1f2937;
 }
-th,td{
-    padding:10px 6px; 
-    text-align:center;
-    border: 1px solid #d1d5db; /* Classical border */
-    font-weight: 700; /* All table text bold */
+th, td {
+    padding: 10px 6px; 
+    text-align: center; /* Ensures content is centered */
+    border: 1px solid #d1d5db; 
+    font-weight: 700; 
 }
 th {
     background: #e5e7eb; 
     color: #1f2937;
+    position: sticky; /* Make header sticky */
+    top: 0; /* Stick to the top of the container */
+    z-index: 10; /* Ensure header is above rows */
 }
-td.name{text-align:left;font-weight:700}
+td.name, th:first-child { 
+    text-align: left; /* Keep names left-aligned for readability */
+    padding-left: 10px;
+}
 
 /* Special Row Styles */
 .totals-row td {
@@ -147,7 +159,7 @@ td.name{text-align:left;font-weight:700}
 }
 
 
-/* Live Traffic Sidebar */
+/* --- Live Traffic Sidebar --- */
 .sidebar {
     position: fixed;
     top: 0;
@@ -188,7 +200,7 @@ td.name{text-align:left;font-weight:700}
 }
 
 footer{
-    background: #f9fafb; /* Consistent footer background */
+    background: #f9fafb; 
     text-align:center;
     font-size:12px;
     font-weight: 700;
@@ -204,8 +216,8 @@ footer{
 <header>
     <h1>Sky Dreamers • Operations Control Room</h1>
     <div class="time-info">
-        <span id="lastSubmissionTime" style="color: #ef4444;">Last Submission • N/A</span>
-        <span id="lastRefreshedTime" style="color: #10b981;">Last Refreshed • N/A</span>
+        <span id="lastSubmissionTime">Last Submission • N/A</span>
+        <span id="lastRefreshedTime">Refreshed • N/A</span>
     </div>
 </header>
 
@@ -228,16 +240,24 @@ footer{
 
 <div class="main">
     <div class="panel">
-        <h3 id="agentsTitle">Agents (All Campaigns)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Agent</th><th>Subs</th><th>Qual</th><th>FPH</th><th>SPH</th><th>Avg TT</th><th>Last Form</th>
-                </tr>
-            </thead>
-            <tbody id="agentsBody"></tbody>
-            <tfoot id="agentsTotal"></tfoot>
-        </table>
+        <h3 id="agentsTitle">Agents (All Campaigns) - Sorted by QUALIFIED</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Agent</th>
+                        <th style="width: 10%;">Subs</th>
+                        <th style="width: 10%;">Qual</th>
+                        <th style="width: 10%;">FPH</th>
+                        <th style="width: 10%;">SPH</th>
+                        <th style="width: 15%;">Avg TT</th>
+                        <th style="width: 20%;">Last Form</th>
+                    </tr>
+                </thead>
+                <tbody id="agentsBody"></tbody>
+                <tfoot id="agentsTotal"></tfoot>
+            </table>
+        </div>
     </div>
 
     <div>
@@ -246,21 +266,14 @@ footer{
             <table>
                 <thead>
                     <tr>
-                        <th>Camp</th><th>Subs</th><th>Qual</th><th>FPH</th>
+                        <th style="width: 35%;">Camp</th>
+                        <th style="width: 15%;">Subs</th>
+                        <th style="width: 15%;">Qual</th>
+                        <th style="width: 35%;">FPH</th>
                     </tr>
                 </thead>
                 <tbody id="campaignsBody"></tbody>
                 <tfoot id="campaignsTotal"></tfoot>
-            </table>
-        </div>
-        
-        <div class="panel" style="margin-top: 16px;">
-            <h3>State Volume (Top Traffic)</h3>
-            <table class="state-table">
-                <thead>
-                    <tr><th>State</th><th>Volume</th></tr>
-                </thead>
-                <tbody id="statesBody"></tbody>
             </table>
         </div>
     </div>
@@ -268,9 +281,13 @@ footer{
 
 <div class="sidebar" id="liveTrafficSidebar">
     <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
-    <h3>Live Traffic Focus</h3>
-    <p>This sidebar can be used for more detailed, focused information (e.g., individual agent time tracking, specific dialer metrics, etc.)</p>
-    <p>Currently, the State Volume is integrated into the main panel for better visibility.</p>
+    <h3>Live Traffic (State Volume)</h3>
+    <table class="state-table">
+        <thead>
+            <tr><th style="width: 50%;">State</th><th style="width: 50%;">Volume</th></tr>
+        </thead>
+        <tbody id="statesBody"></tbody>
+    </table>
 </div>
 
 <footer>Sky Dreamers • Operations Hub © 2025</footer>
@@ -320,7 +337,6 @@ function formatPKTTimeOnly(isoString) {
     if (!isoString) return 'N/A';
     const fullPKT = formatPKTTime(isoString);
     const parts = fullPKT.split(' at ');
-    // Displays TIME only (e.g., 5:33 AM)
     return parts.length > 1 ? parts[1] : 'N/A'; 
 }
 
@@ -331,7 +347,7 @@ function calculateCampaignSummary(campaignName) {
 }
 
 function sortAgentsByQualified(agents) {
-    // Sort Z to A (Highest Qualified first) for actionable insight
+    // Sort Z to A (Highest Qualified first)
     return Object.entries(agents).sort((a, b) => b[1].qualified - a[1].qualified);
 }
 
@@ -351,7 +367,7 @@ function renderDashboard(d){
     
     dashboardData = d; 
     
-    // Time Display Update (Critical Insight)
+    // Time Display Update
     document.getElementById('lastRefreshedTime').innerText = `Refreshed • ${formatPKTTime(d.lastUpdated)}`;
     document.getElementById('lastSubmissionTime').innerText = `Submission • ${formatPKTTime(d.lastSubmission) || 'N/A'}`;
 
@@ -376,7 +392,6 @@ function renderAllPanels(filter) {
         fph.innerText = summaryData.fph.toFixed(2);
         sph.innerText = summaryData.sph.toFixed(2);
         
-        // Handle pending text color for contrast on yellow background
         document.getElementById('pending-card').style.color = summaryData.pending > 0 ? '#1f2937' : 'white';
     } else {
         submissions.innerText = qualified.innerText = notQualified.innerText = pending.innerText = '0';
@@ -384,13 +399,13 @@ function renderAllPanels(filter) {
     }
 
     // 2. Render Agents Table
-    document.getElementById('agentsTitle').innerText = filter === 'All' ? 'Agents (All Campaigns) - Sorted by QUALIFIED' : `Agents (Performance for ${filter}) - Sorted by QUALIFIED`;
+    document.getElementById('agentsTitle').innerText = filter === 'All' ? 'Agents (All Campaigns) - Sorted by QUALIFIED' : `Agents (${filter}) - Sorted by QUALIFIED`;
     renderAgents(dashboardData.agents || {}, summaryData, filter);
     
     // 3. Render Campaigns Table
     renderCampaigns(dashboardData.campaigns || {}, dashboardData.summary); 
     
-    // 4. Render States Panel (Integrated into the main panel)
+    // 4. Render States Panel (Renders into the sidebar)
     renderStates(dashboardData.states || {}); 
 }
 
@@ -423,7 +438,8 @@ function renderAgents(allAgents, summary, filter){
     if (summary) {
         tfoot.innerHTML=`
             <tr class="totals-row">
-                <td class="name" style="text-align:center;" colspan="2">TOTALS (${filter})</td>
+                <td class="name" style="text-align:center;">TOTALS (${filter})</td>
+                <td>${summary.submissions}</td>
                 <td>${summary.qualified}</td>
                 <td>${summary.fph.toFixed(2)}</td>
                 <td>${summary.sph.toFixed(2)}</td>
@@ -471,7 +487,6 @@ function renderStates(s){
     tbody.innerHTML = "";
     
     let stateArray = Object.entries(s).map(([state, volume]) => ({ state, volume }));
-    // Sort Z to A (Highest Volume first)
     stateArray.sort((a, b) => b.volume - a.volume);
     
     stateArray.forEach(item => {
@@ -496,10 +511,9 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
         
         if (campaign === undefined) return;
         
-        // FIX: The Live Traffic button now opens the sidebar correctly.
+        // Live Traffic button logic
         if (campaign === 'Live Traffic') {
             openSidebar();
-            // Do NOT change the active button state or filter when opening the sidebar
             return;
         }
         
@@ -511,7 +525,6 @@ document.getElementById('campaignFilters').addEventListener('click', (e) => {
         });
         e.target.classList.add('active');
         
-        // Set new filter and re-render ALL panels
         currentFilter = campaign;
         if (dashboardData) {
             renderAllPanels(currentFilter);
