@@ -1,78 +1,188 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Sky Dreamers • Live Hub</title>
-    <style>
-        :root { --navy: #1a2a44; --white: #ffffff; --bg: #f8fafc; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #334155; }
-        header, footer { background: var(--navy); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .pill { background: rgba(255,255,255,0.15); padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; padding: 20px; }
-        .card { padding: 20px; border-radius: 12px; color: white; text-align: center; }
-        .card h2 { margin: 0; font-size: 32px; }
-        .card p { margin: 5px 0 0; font-size: 10px; font-weight: bold; opacity: 0.9; }
-        .m-blue { background: #3b82f6; } .m-green { background: #10b981; } .m-red { background: #ef4444; }
-        .m-yellow { background: #f59e0b; } .m-purple { background: #8b5cf6; } .m-orange { background: #f97316; }
-        .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; padding: 0 20px 20px; }
-        .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        h3 { margin-top: 0; font-size: 14px; color: var(--navy); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { text-align: left; padding: 10px; color: #64748b; border-bottom: 2px solid #f1f5f9; }
-        td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 600; }
-        .state-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .state-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 8px; text-align: center; }
-        .state-item b { display: block; font-size: 14px; color: var(--navy); }
-        .state-item span { font-size: 10px; color: #94a3b8; }
-    </style>
-</head>
-<body>
-<header>
-    <h1>Sky Dreamers Control</h1>
-    <div class="pill" id="lastSub">Last Submission: --:--</div>
-</header>
-<div class="metrics">
-    <div class="card m-blue"><h2 id="t-sub">0</h2><p>SUBMISSIONS</p></div>
-    <div class="card m-green"><h2 id="t-qual">0</h2><p>QUALIFIED</p></div>
-    <div class="card m-red"><h2 id="t-nq">0</h2><p>NOT QUALIFIED</p></div>
-    <div class="card m-yellow"><h2 id="t-pend">0</h2><p>PENDING</p></div>
-    <div class="card m-purple"><h2 id="t-fph">0.0</h2><p>FPH</p></div>
-    <div class="card m-orange"><h2 id="t-sph">0.0</h2><p>SPH</p></div>
-</div>
-<div class="main-grid">
-    <div class="panel"><h3>Agent Leaderboard</h3><table id="agent-table"><thead><tr><th>Agent</th><th>Subs</th><th>Qual</th><th>FPH</th><th>SPH</th><th>Talk</th></tr></thead><tbody></tbody></table></div>
-    <div>
-        <div class="panel"><h3>Campaigns</h3><table id="camp-table"><thead><tr><th>Name</th><th>Subs</th><th>Qual</th></tr></thead><tbody></tbody></table></div>
-        <div class="panel" style="margin-top:20px"><h3>Live States</h3><div class="state-grid" id="state-list"></div></div>
-    </div>
-</div>
-<footer>Sky Dreamers Real-Time Hub • © 2025</footer>
+<meta charset="UTF-8">
+<title>Sky Dreamers – Live Ops Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial;
+  background:#0f172a;
+  color:#e5e7eb;
+}
+header{
+  padding:16px;
+  font-size:22px;
+  font-weight:700;
+}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:14px;
+  padding:0 16px;
+}
+.card{
+  background:#1f2937;
+  border-radius:14px;
+  padding:16px;
+  text-align:center;
+}
+.card h2{margin:0;font-size:32px}
+.card span{font-size:12px;color:#9ca3af}
+.main{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:16px;
+  padding:16px;
+}
+.panel{
+  background:#111827;
+  border-radius:14px;
+  padding:14px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+th,td{
+  padding:6px;
+  text-align:center;
+}
+td.name{text-align:left;font-weight:700}
+tr{border-bottom:1px solid rgba(255,255,255,.08)}
+.states{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(70px,1fr));
+  gap:8px;
+}
+.state{
+  background:#020617;
+  border-radius:8px;
+  padding:8px;
+  text-align:center;
+  font-size:12px;
+}
+footer{
+  text-align:center;
+  font-size:11px;
+  color:#9ca3af;
+  padding:12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>Sky Dreamers • Live Performance</header>
+
+<div class="cards">
+  <div class="card"><h2 id="submissions">0</h2><span>Submissions</span></div>
+  <div class="card"><h2 id="qualified">0</h2><span>Qualified</span></div>
+  <div class="card"><h2 id="notQualified">0</h2><span>Not Qualified</span></div>
+  <div class="card"><h2 id="pending">0</h2><span>Pending</span></div>
+  <div class="card"><h2 id="fph">0.00</h2><span>FPH</span></div>
+  <div class="card"><h2 id="sph">0.00</h2><span>SPH</span></div>
+</div>
+
+<div class="main">
+  <div class="panel">
+    <h3>Agents</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Agent</th><th>Subs</th><th>Qual</th><th>FPH</th><th>SPH</th><th>Avg TT</th>
+        </tr>
+      </thead>
+      <tbody id="agents"></tbody>
+    </table>
+  </div>
+
+  <div>
+    <div class="panel">
+      <h3>Campaigns</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Campaign</th><th>Subs</th><th>Qual</th><th>FPH</th>
+          </tr>
+        </thead>
+        <tbody id="campaigns"></tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top:12px">
+      <h3>States</h3>
+      <div class="states" id="states"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Sky Dreamers © 2025</footer>
+
 <script>
-    firebase.initializeApp({ databaseURL: "https://performance-dashboard-c7017-default-rtdb.firebaseio.com" });
-    const db = firebase.database().ref("dashboard/live");
-    db.on("value", (snap) => {
-        const d = snap.val(); if(!d) return;
-        document.getElementById('lastSub').innerText = `Last Sub: ${new Date(d.lastSubmission).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
-        document.getElementById('t-sub').innerText = d.summary.submissions;
-        document.getElementById('t-qual').innerText = d.summary.qualified;
-        document.getElementById('t-nq').innerText = d.summary.notQualified;
-        document.getElementById('t-pend').innerText = d.summary.pending;
-        document.getElementById('t-fph').innerText = d.summary.fph.toFixed(1);
-        document.getElementById('t-sph').innerText = d.summary.sph.toFixed(1);
-        const aBody = document.querySelector("#agent-table tbody"); aBody.innerHTML = "";
-        Object.entries(d.agents).sort((a,b) => b[1].qualified - a[1].qualified).forEach(([n, s]) => {
-            aBody.innerHTML += `<tr><td>${n}</td><td>${s.submissions}</td><td>${s.qualified}</td><td>${s.fph}</td><td>${s.sph}</td><td>${Math.floor(s.avgTalkTime/60)}m</td></tr>`;
-        });
-        const cBody = document.querySelector("#camp-table tbody"); cBody.innerHTML = "";
-        Object.entries(d.campaigns).forEach(([n, s]) => { cBody.innerHTML += `<tr><td>${n}</td><td>${s.submissions}</td><td>${s.qualified}</td></tr>`; });
-        const sList = document.getElementById("state-list"); sList.innerHTML = "";
-        Object.entries(d.states).sort((a,b) => b[1] - a[1]).slice(0, 12).forEach(([st, count]) => {
-            sList.innerHTML += `<div class="state-item"><span>${st}</span><b>${count}</b></div>`;
-        });
-    });
+firebase.initializeApp({
+  databaseURL:"https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
+});
+
+firebase.database().ref("dashboard/live").on("value", snap => {
+  const d = snap.val();
+  if (!d || !d.summary) return;
+
+  submissions.innerText = d.summary.submissions;
+  qualified.innerText = d.summary.qualified;
+  notQualified.innerText = d.summary.notQualified;
+  pending.innerText = d.summary.pending;
+  fph.innerText = d.summary.fph.toFixed(2);
+  sph.innerText = d.summary.sph.toFixed(2);
+
+  renderAgents(d.agents || {});
+  renderCampaigns(d.campaigns || {});
+  renderStates(d.states || {});
+});
+
+function renderAgents(a){
+  agents.innerHTML="";
+  Object.entries(a).forEach(([n,v])=>{
+    agents.innerHTML+=`
+      <tr>
+        <td class="name">${n}</td>
+        <td>${v.submissions}</td>
+        <td>${v.qualified}</td>
+        <td>${v.fph.toFixed(2)}</td>
+        <td>${v.sph.toFixed(2)}</td>
+        <td>${fmt(v.avgTalkTime)}</td>
+      </tr>`;
+  });
+}
+function renderCampaigns(c){
+  campaigns.innerHTML="";
+  Object.entries(c).forEach(([n,v])=>{
+    campaigns.innerHTML+=`
+      <tr>
+        <td class="name">${n}</td>
+        <td>${v.submissions}</td>
+        <td>${v.qualified}</td>
+        <td>${v.fph.toFixed(2)}</td>
+      </tr>`;
+  });
+}
+function renderStates(s){
+  states.innerHTML="";
+  Object.entries(s).forEach(([k,v])=>{
+    states.innerHTML+=`<div class="state">${k}<br><b>${v}</b></div>`;
+  });
+}
+function fmt(sec){
+  if(!sec) return "0:00";
+  return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0");
+}
 </script>
+
 </body>
 </html>
