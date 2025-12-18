@@ -441,21 +441,26 @@
         let currentView = 'performance';
 
         // Formatting helpers - FIXED TIMESTAMP FORMATTING
-        function formatPKTTime(isoString) {
+function formatPKTTime(isoString) {
     if (!isoString) return 'N/A';
     try {
         const date = new Date(isoString);
         if (isNaN(date.getTime())) return 'N/A';
         
-        // SUBTRACT 21 hours (16 + 5 = 21)
-        const adjustedDate = new Date(date.getTime() - (21 * 60 * 60 * 1000));
+        // Convert to PKT: -8 hours from backend UTC
+        const pktDate = new Date(date.getTime() - (8 * 60 * 60 * 1000));
         
-        const month = adjustedDate.toLocaleString('en-US', { month: 'short' });
-        const day = adjustedDate.getDate();
-        const hour = adjustedDate.getHours();
-        const minute = adjustedDate.getMinutes().toString().padStart(2, '0');
+        const month = pktDate.toLocaleString('en-US', { month: 'short' });
+        const day = pktDate.getDate();
+        let hour = pktDate.getHours();
+        const minute = pktDate.getMinutes().toString().padStart(2, '0');
         
-        return `${month} ${day}, ${hour}:${minute}`;
+        // Convert to 12-hour format with AM/PM
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12;
+        hour = hour ? hour : 12; // Convert 0 to 12
+        
+        return `${month} ${day}, ${hour}:${minute} ${ampm}`;
     } catch (e) {
         console.error("Error formatting time:", e, isoString);
         return 'N/A';
@@ -468,70 +473,32 @@ function formatLastSubmissionTime(isoString) {
         const date = new Date(isoString);
         if (isNaN(date.getTime())) return 'No data yet';
         
-        // SUBTRACT 21 hours (16 + 5 = 21)
-        const adjustedDate = new Date(date.getTime() - (21 * 60 * 60 * 1000));
+        // Convert to PKT: -8 hours from backend UTC
+        const pktDate = new Date(date.getTime() - (8 * 60 * 60 * 1000));
         
-        const month = adjustedDate.toLocaleString('en-US', { month: 'short' });
-        const day = adjustedDate.getDate();
-        const hour = adjustedDate.getHours();
-        const minute = adjustedDate.getMinutes().toString().padStart(2, '0');
+        const month = pktDate.toLocaleString('en-US', { month: 'short' });
+        const day = pktDate.getDate();
+        let hour = pktDate.getHours();
+        const minute = pktDate.getMinutes().toString().padStart(2, '0');
         
-        return `${month} ${day}, ${hour}:${minute}`;
+        // Convert to 12-hour format with AM/PM
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12;
+        hour = hour ? hour : 12; // Convert 0 to 12
+        
+        return `${month} ${day}, ${hour}:${minute} ${ampm}`;
     } catch (e) {
         console.error("Error formatting last submission:", e);
         return 'No data yet';
     }
 }
 
-function formatLastSubmissionTime(isoString) {
-    if (!isoString) return 'No data yet';
-    try {
-        const date = new Date(isoString);
-        if (isNaN(date.getTime())) return 'No data yet';
-        
-        // SUBTRACT 16 hours to get from UTC to PST time with correct date
-        const adjustedDate = new Date(date.getTime() - (16 * 60 * 60 * 1000));
-        
-        const month = adjustedDate.toLocaleString('en-US', { month: 'short' });
-        const day = adjustedDate.getDate();
-        const hour = adjustedDate.getHours();
-        const minute = adjustedDate.getMinutes().toString().padStart(2, '0');
-        
-        return `${month} ${day}, ${hour}:${minute}`;
-    } catch (e) {
-        console.error("Error formatting last submission:", e);
-        return 'No data yet';
-    }
+function formatDuration(seconds) {
+    if (!seconds || seconds === 0) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
-
-        function formatLastSubmissionTime(isoString) {
-    if (!isoString) return 'No data yet';
-    try {
-        const date = new Date(isoString);
-        if (isNaN(date.getTime())) return 'No data yet';
-        
-        // CHANGE: ADD 8 hours instead of subtracting
-        const pstDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
-        
-        const month = pstDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-        const day = pstDate.getUTCDate();
-        const hour = pstDate.getUTCHours();
-        const minute = pstDate.getUTCMinutes().toString().padStart(2, '0');
-        
-        return `${month} ${day}, ${hour}:${minute}`;
-    } catch (e) {
-        console.error("Error formatting last submission:", e);
-        return 'No data yet';
-    }
-}
-
-        function formatDuration(seconds) {
-            if (!seconds || seconds === 0) return "0:00";
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
         // Filter management - FIXED
         function setFilter(filter) {
             currentFilter = filter;
