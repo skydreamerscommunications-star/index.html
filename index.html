@@ -89,11 +89,6 @@
             transform: translateY(-2px);
             transition: all 0.2s ease;
         }
-        
-        /* Performance status colors */
-        .performance-excellent { color: #059669; }
-        .performance-good { color: #d97706; }
-        .performance-needs-improvement { color: #dc2626; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -441,6 +436,7 @@
         });
 
         let dashboardData = null;
+        let rawSubmissionsData = null;
         let currentFilter = 'All';
         let currentView = 'performance';
 
@@ -455,6 +451,16 @@
             });
         }
 
+        function formatDateTime(isoString) {
+            if (!isoString) return 'N/A';
+            const date = new Date(isoString);
+            return date.toLocaleString('en-US', {
+                month: 'short', day: 'numeric',
+                hour: 'numeric', minute: '2-digit',
+                hour12: true, timeZone: 'America/Los_Angeles'
+            });
+        }
+
         function formatDuration(seconds) {
             if (!seconds) return "0:00";
             const mins = Math.floor(seconds / 60);
@@ -462,7 +468,7 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // Filter management
+        // Filter management - FIXED
         function setFilter(filter) {
             currentFilter = filter;
             
@@ -476,11 +482,11 @@
             event.currentTarget.classList.add('active', 'bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
             
             if (dashboardData) {
-                renderDashboard(dashboardData);
+                renderAllData();
             }
         }
 
-        // Table view management
+        // Table view management - FIXED
         function setTableView(view) {
             currentView = view;
             
@@ -511,66 +517,94 @@
                 <i class="fas fa-${view === 'performance' ? 'users' : view === 'submissions' ? 'database' : 'phone'} mr-2 text-blue-500"></i>
                 ${titles[view]}
             `;
+            
+            // Render the selected view
+            if (dashboardData) {
+                switch(view) {
+                    case 'performance':
+                        renderAgents();
+                        break;
+                    case 'dids':
+                        renderDIDs();
+                        break;
+                    case 'submissions':
+                        renderLiveSubmissions();
+                        break;
+                }
+            }
         }
 
-        // Process Firebase data
+        // Process Firebase data - FIXED for new backend structure
         function processFirebaseData(data) {
-            console.log("Processing Firebase data:", data);
+            console.log("Processing dashboard data:", data);
             
-            // Extract data from your structure
-            const agents = data.agent || {};
-            const campaigns = data.campaign || data.Zumaglpm || {};
-            const summary = data.summary || {};
-            const states = data.states || (data.meta && data.meta.states) || {};
-            const dids = data.dids || {};
-            
-            // Convert to consistent structure
             return {
-                agents: agents,
-                campaigns: campaigns,
-                summary: summary,
-                states: states,
-                dids: dids,
-                lastSubmission: data.lastSubmission || data.LastSubmission,
-                lastUpdated: data.lastUpdated
+                agents: data.agent || {},
+                campaigns: data.campaign || {},
+                dids: data.dids || {},
+                states: data.states || {},
+                summary: data.summary || {},
+                lastSubmission: data.lastSubmission,
+                lastUpdated: data.lastUpdated,
+                meta: data.meta || {}
             };
         }
 
-        // Filter agents by campaign
-        function filterAgentsByCampaign(agents, campaign) {
-            if (campaign === 'All') return agents;
-            
-            // This is a placeholder - you'll need actual agent-campaign mapping
-            // For now, return all agents
-            return agents;
-        }
-
-        // Calculate filtered summary
+        // Calculate filtered summary - FIXED
         function calculateFilteredSummary(data, filter) {
-            if (filter === 'All') return data.summary;
+            if (filter === 'All') {
+                return data.summary || {};
+            }
             
             const campaign = data.campaigns[filter];
             if (campaign) {
                 return {
-                    submissions: campaign.submissions || campaign.submission || 0,
+                    submissions: campaign.submissions || 0,
                     qualified: campaign.qualified || 0,
                     notQualified: campaign.notQualified || 0,
                     pending: campaign.pending || 0,
                     callback: campaign.callback || 0,
                     fph: campaign.fph || 0,
                     sph: campaign.sph || 0,
-                    avgTalkTime: campaign.avgTalkTime || campaign.avgfalkTime || 0
+                    avgTalkTime: campaign.avgTalkTime || 0
                 };
             }
             
-            return data.summary;
+            // If campaign not found, return empty summary
+            return {
+                submissions: 0,
+                qualified: 0,
+                notQualified: 0,
+                pending: 0,
+                callback: 0,
+                fph: 0,
+                sph: 0,
+                avgTalkTime: 0
+            };
         }
 
-        // Render functions
-        function renderDashboard(rawData) {
-            if (!rawData) return;
+        // Filter agents by campaign - FIXED
+        function filterAgentsByCampaign(agents, campaignName) {
+            if (campaignName === 'All') return agents;
             
-            dashboardData = processFirebaseData(rawData);
+            // Filter agents who have worked on this campaign
+            const filtered = {};
+            Object.keys(agents).forEach(agentName => {
+                const agent = agents[agentName];
+                // Check if agent has campaigns property and includes this campaign
+                if (agent.campaigns && agent.campaigns.includes(campaignName)) {
+                    filtered[agentName] = agent;
+                }
+            });
+            
+            return filtered;
+        }
+
+        // Main render function - FIXED
+        function renderAllData() {
+            if (!dashboardData) return;
+            
+            console.log("Rendering all data with filter:", currentFilter);
             
             // Update time
             document.getElementById('lastSubmissionTime').textContent = 
@@ -578,47 +612,50 @@
 
             // Update metrics with filtered data
             const filteredSummary = calculateFilteredSummary(dashboardData, currentFilter);
-            if (filteredSummary) {
-                document.getElementById('submissions').textContent = filteredSummary.submissions || filteredSummary.submission || 0;
-                document.getElementById('qualified').textContent = filteredSummary.qualified || 0;
-                document.getElementById('notQualified').textContent = filteredSummary.notQualified || 0;
-                document.getElementById('pending').textContent = filteredSummary.pending || 0;
-                document.getElementById('callback').textContent = filteredSummary.callback || 0;
-                document.getElementById('fph').textContent = (filteredSummary.fph || 0).toFixed(2);
-                document.getElementById('sph').textContent = (filteredSummary.sph || 0).toFixed(2);
-                document.getElementById('avgTalkTime').textContent = formatDuration(filteredSummary.avgTalkTime || filteredSummary.avgfalkTime || 0);
-            }
+            console.log("Filtered summary:", filteredSummary);
+            
+            document.getElementById('submissions').textContent = filteredSummary.submissions || 0;
+            document.getElementById('qualified').textContent = filteredSummary.qualified || 0;
+            document.getElementById('notQualified').textContent = filteredSummary.notQualified || 0;
+            document.getElementById('pending').textContent = filteredSummary.pending || 0;
+            document.getElementById('callback').textContent = filteredSummary.callback || 0;
+            document.getElementById('fph').textContent = (filteredSummary.fph || 0).toFixed(2);
+            document.getElementById('sph').textContent = (filteredSummary.sph || 0).toFixed(2);
+            document.getElementById('avgTalkTime').textContent = formatDuration(filteredSummary.avgTalkTime || 0);
 
             // Render based on current view
             switch(currentView) {
                 case 'performance':
-                    renderAgents(dashboardData.agents, currentFilter);
+                    renderAgents();
                     break;
                 case 'dids':
-                    renderDIDs(dashboardData.dids);
+                    renderDIDs();
                     break;
                 case 'submissions':
-                    // Placeholder for live submissions
+                    renderLiveSubmissions();
                     break;
             }
 
             // Always render campaigns and states
-            renderCampaigns(dashboardData.campaigns, dashboardData.summary);
-            renderStates(dashboardData.states);
-            renderTopStates(dashboardData.states);
+            renderCampaigns();
+            renderTopStates();
         }
 
-        function renderAgents(agents, filter) {
+        // Render agents - FIXED
+        function renderAgents() {
             const tbody = document.getElementById('agentsBody');
             const tfoot = document.getElementById('agentsTotal');
             tbody.innerHTML = '';
             
-            if (!agents || Object.keys(agents).length === 0) {
+            // Filter agents by current campaign
+            const filteredAgents = filterAgentsByCampaign(dashboardData.agents, currentFilter);
+            
+            if (!filteredAgents || Object.keys(filteredAgents).length === 0) {
                 tbody.innerHTML = `
                     <tr class="bg-white">
                         <td colspan="7" class="py-8 text-center text-gray-500">
                             <i class="fas fa-users text-2xl mb-2 text-gray-300"></i><br>
-                            No agent data available
+                            No agent data available for ${currentFilter}
                         </td>
                     </tr>
                 `;
@@ -627,7 +664,7 @@
             }
             
             // Sort agents by qualified
-            const sortedAgents = Object.entries(agents)
+            const sortedAgents = Object.entries(filteredAgents)
                 .filter(([name]) => name && name !== "undefined")
                 .sort((a, b) => (b[1].qualified || 0) - (a[1].qualified || 0));
             
@@ -644,18 +681,18 @@
                                 ${name}
                             </div>
                         </td>
-                        <td class="py-3 px-4">${stats.submissions || stats.submission || 0}</td>
+                        <td class="py-3 px-4">${stats.submissions || 0}</td>
                         <td class="py-3 px-4 font-bold text-green-600">${stats.qualified || 0}</td>
                         <td class="py-3 px-4 text-red-500">${stats.notQualified || 0}</td>
                         <td class="py-3 px-4">${(stats.fph || 0).toFixed(2)}</td>
                         <td class="py-3 px-4">${(stats.sph || 0).toFixed(2)}</td>
-                        <td class="py-3 px-4">${formatDuration(stats.avgTalkTime || stats.avgfalkTime || 0)}</td>
+                        <td class="py-3 px-4">${formatDuration(stats.avgTalkTime || 0)}</td>
                     </tr>
                 `;
             });
             
             // Calculate totals
-            const totalSubmissions = sortedAgents.reduce((sum, [_, stats]) => sum + (stats.submissions || stats.submission || 0), 0);
+            const totalSubmissions = sortedAgents.reduce((sum, [_, stats]) => sum + (stats.submissions || 0), 0);
             const totalQualified = sortedAgents.reduce((sum, [_, stats]) => sum + (stats.qualified || 0), 0);
             const totalNotQualified = sortedAgents.reduce((sum, [_, stats]) => sum + (stats.notQualified || 0), 0);
             const avgFPH = sortedAgents.length > 0 ? 
@@ -665,7 +702,7 @@
             
             tfoot.innerHTML = `
                 <tr>
-                    <td class="py-3 px-4">TOTALS (${filter})</td>
+                    <td class="py-3 px-4">TOTALS (${currentFilter})</td>
                     <td class="py-3 px-4">${totalSubmissions}</td>
                     <td class="py-3 px-4">${totalQualified}</td>
                     <td class="py-3 px-4">${totalNotQualified}</td>
@@ -676,12 +713,13 @@
             `;
         }
 
-        function renderDIDs(dids) {
+        // Render DIDs - FIXED
+        function renderDIDs() {
             const tbody = document.getElementById('didsBody');
             const tfoot = document.getElementById('didsTotal');
             tbody.innerHTML = '';
             
-            if (!dids || Object.keys(dids).length === 0) {
+            if (!dashboardData.dids || Object.keys(dashboardData.dids).length === 0) {
                 tbody.innerHTML = `
                     <tr class="bg-white">
                         <td colspan="7" class="py-8 text-center text-gray-500">
@@ -695,7 +733,7 @@
             }
             
             // Sort DIDs by qualified
-            const sortedDIDs = Object.entries(dids)
+            const sortedDIDs = Object.entries(dashboardData.dids)
                 .sort((a, b) => (b[1].qualified || 0) - (a[1].qualified || 0));
             
             sortedDIDs.forEach(([did, stats], index) => {
@@ -732,12 +770,59 @@
             `;
         }
 
-        function renderCampaigns(campaigns, summary) {
+        // Render live submissions - FIXED
+        function renderLiveSubmissions() {
+            const tbody = document.getElementById('liveSubmissionsBody');
+            tbody.innerHTML = '';
+            
+            if (!rawSubmissionsData || !rawSubmissionsData.submissions || rawSubmissionsData.submissions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-8 text-center text-gray-500">
+                            <i class="fas fa-database text-2xl mb-2 text-gray-300"></i><br>
+                            Loading live submissions...
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const submissions = rawSubmissionsData.submissions;
+            
+            submissions.forEach((sub, index) => {
+                const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass} hover:bg-blue-50 transition-colors duration-150">
+                        <td class="py-3 px-4 text-xs">${formatDateTime(sub.timestamp)}</td>
+                        <td class="py-3 px-4">${sub.agent || 'Unknown'}</td>
+                        <td class="py-3 px-4 text-sm">${sub.did || 'N/A'}</td>
+                        <td class="py-3 px-4">${sub.state || 'N/A'}</td>
+                        <td class="py-3 px-4">${sub.campaign || 'Unknown'}</td>
+                        <td class="py-3 px-4">${formatDuration(sub.duration || 0)}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded text-xs font-medium ${
+                                sub.disposition === 'Qualified' ? 'bg-green-100 text-green-800' :
+                                sub.disposition === 'Not Qualified' ? 'bg-red-100 text-red-800' :
+                                sub.disposition === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                sub.disposition === 'Call Back' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'
+                            }">
+                                ${sub.disposition || 'Unknown'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Render campaigns - FIXED
+        function renderCampaigns() {
             const tbody = document.getElementById('campaignsBody');
             const tfoot = document.getElementById('campaignsTotal');
             tbody.innerHTML = '';
             
-            if (!campaigns || Object.keys(campaigns).length === 0) {
+            if (!dashboardData.campaigns || Object.keys(dashboardData.campaigns).length === 0) {
                 tbody.innerHTML = `
                     <tr class="bg-white">
                         <td colspan="4" class="py-8 text-center text-gray-500">
@@ -750,36 +835,34 @@
                 return;
             }
             
-            Object.entries(campaigns).forEach(([name, stats], index) => {
-                if (name === 'Zumaglpm') return; // Skip meta object
-                
+            Object.entries(dashboardData.campaigns).forEach(([name, stats], index) => {
                 tbody.innerHTML += `
                     <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-green-50 transition-colors duration-150">
                         <td class="py-2 px-3 font-medium">${name}</td>
-                        <td class="py-2 px-3">${stats.submissions || stats.submission || 0}</td>
+                        <td class="py-2 px-3">${stats.submissions || 0}</td>
                         <td class="py-2 px-3 font-bold text-green-600">${stats.qualified || 0}</td>
                         <td class="py-2 px-3">${(stats.fph || 0).toFixed(2)}</td>
                     </tr>
                 `;
             });
             
-            if (summary) {
-                tfoot.innerHTML = `
-                    <tr>
-                        <td class="py-2 px-3">TOTALS</td>
-                        <td class="py-2 px-3">${summary.submissions || summary.submission || 0}</td>
-                        <td class="py-2 px-3">${summary.qualified || 0}</td>
-                        <td class="py-2 px-3">${(summary.fph || 0).toFixed(2)}</td>
-                    </tr>
-                `;
-            }
+            const summary = dashboardData.summary || {};
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="py-2 px-3">TOTALS</td>
+                    <td class="py-2 px-3">${summary.submissions || 0}</td>
+                    <td class="py-2 px-3">${summary.qualified || 0}</td>
+                    <td class="py-2 px-3">${(summary.fph || 0).toFixed(2)}</td>
+                </tr>
+            `;
         }
 
-        function renderTopStates(states) {
+        // Render top states - FIXED
+        function renderTopStates() {
             const container = document.getElementById('topStatesBody');
             container.innerHTML = '';
             
-            if (!states || Object.keys(states).length === 0) {
+            if (!dashboardData.states || Object.keys(dashboardData.states).length === 0) {
                 container.innerHTML = `
                     <div class="col-span-2 text-center py-4 text-gray-500">
                         <i class="fas fa-map text-xl mb-1 text-gray-300"></i><br>
@@ -789,7 +872,7 @@
                 return;
             }
             
-            const sortedStates = Object.entries(states)
+            const sortedStates = Object.entries(dashboardData.states)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 4);
             
@@ -803,11 +886,12 @@
             });
         }
 
-        function renderStates(states) {
+        // Render states in modal - FIXED
+        function renderStates() {
             const container = document.getElementById('statesBody');
             container.innerHTML = '';
             
-            if (!states || Object.keys(states).length === 0) {
+            if (!dashboardData.states || Object.keys(dashboardData.states).length === 0) {
                 container.innerHTML = `
                     <div class="col-span-3 text-center py-8 text-gray-500">
                         <i class="fas fa-map-marked-alt text-2xl mb-2 text-gray-300"></i><br>
@@ -817,10 +901,10 @@
                 return;
             }
             
-            const sortedStates = Object.entries(states)
+            const sortedStates = Object.entries(dashboardData.states)
                 .sort((a, b) => b[1] - a[1]);
             
-            const maxVolume = Math.max(...Object.values(states));
+            const maxVolume = Math.max(...Object.values(dashboardData.states));
             
             sortedStates.forEach(([state, volume]) => {
                 const percentage = maxVolume > 0 ? Math.round((volume / maxVolume) * 100) : 0;
@@ -846,6 +930,7 @@
 
         // Modal functions
         function openTrafficModal() {
+            renderStates();
             document.getElementById('trafficModal').classList.remove('hidden');
             document.getElementById('trafficModal').classList.add('flex');
         }
@@ -855,11 +940,25 @@
             document.getElementById('trafficModal').classList.remove('flex');
         }
 
-        // Firebase listener
+        // Firebase listeners - FIXED
         firebase.database().ref("dashboard/live").on("value", snapshot => {
             const data = snapshot.val();
             if (data) {
-                renderDashboard(data);
+                dashboardData = processFirebaseData(data);
+                console.log("Dashboard data loaded:", dashboardData);
+                renderAllData();
+            }
+        });
+
+        // Load raw submissions data
+        firebase.database().ref("dashboard/raw").on("value", snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                rawSubmissionsData = data;
+                console.log("Raw submissions loaded:", rawSubmissionsData);
+                if (currentView === 'submissions') {
+                    renderLiveSubmissions();
+                }
             }
         });
 
