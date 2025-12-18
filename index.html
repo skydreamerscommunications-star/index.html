@@ -447,8 +447,8 @@
         const date = new Date(isoString);
         if (isNaN(date.getTime())) return 'N/A';
         
-        // SUBTRACT 16 hours to get from UTC to PST time with correct date
-        const adjustedDate = new Date(date.getTime() - (16 * 60 * 60 * 1000));
+        // SUBTRACT 21 hours (16 + 5 = 21)
+        const adjustedDate = new Date(date.getTime() - (21 * 60 * 60 * 1000));
         
         const month = adjustedDate.toLocaleString('en-US', { month: 'short' });
         const day = adjustedDate.getDate();
@@ -459,6 +459,27 @@
     } catch (e) {
         console.error("Error formatting time:", e, isoString);
         return 'N/A';
+    }
+}
+
+function formatLastSubmissionTime(isoString) {
+    if (!isoString) return 'No data yet';
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return 'No data yet';
+        
+        // SUBTRACT 21 hours (16 + 5 = 21)
+        const adjustedDate = new Date(date.getTime() - (21 * 60 * 60 * 1000));
+        
+        const month = adjustedDate.toLocaleString('en-US', { month: 'short' });
+        const day = adjustedDate.getDate();
+        const hour = adjustedDate.getHours();
+        const minute = adjustedDate.getMinutes().toString().padStart(2, '0');
+        
+        return `${month} ${day}, ${hour}:${minute}`;
+    } catch (e) {
+        console.error("Error formatting last submission:", e);
+        return 'No data yet';
     }
 }
 
