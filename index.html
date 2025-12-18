@@ -442,52 +442,47 @@
 
         // Formatting helpers - FIXED TIMESTAMP FORMATTING
         function formatPKTTime(isoString) {
-            if (!isoString) return 'N/A';
-            try {
-                const date = new Date(isoString);
-                if (isNaN(date.getTime())) return 'N/A';
-                
-                // The ISO string is in UTC from backend (PST + 8 hours)
-                // PST to PKT is +13 hours, but backend already added 8 hours
-                // So we need to add 5 more hours to get PKT
-                // However, we want to show time in 24-hour format matching sheet
-                // So we'll subtract 8 hours to get back to PST, then format
-                
-                const pstDate = new Date(date.getTime() - (8 * 60 * 60 * 1000));
-                
-                const month = pstDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-                const day = pstDate.getUTCDate();
-                const hour = pstDate.getUTCHours();
-                const minute = pstDate.getUTCMinutes().toString().padStart(2, '0');
-                
-                // 24-hour format without AM/PM
-                return `${month} ${day}, ${hour}:${minute}`;
-            } catch (e) {
-                console.error("Error formatting PKT time:", e, isoString);
-                return 'N/A';
-            }
-        }
+    if (!isoString) return 'N/A';
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return 'N/A';
+        
+        // CHANGE: ADD 8 hours instead of subtracting
+        const adjustedDate = new Date(date.getTime() + (16 * 60 * 60 * 1000));
+        
+        const month = pstDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+        const day = pstDate.getUTCDate();
+        const hour = pstDate.getUTCHours();
+        const minute = pstDate.getUTCMinutes().toString().padStart(2, '0');
+        
+        // 24-hour format without AM/PM
+        return `${month} ${day}, ${hour}:${minute}`;
+    } catch (e) {
+        console.error("Error formatting PKT time:", e, isoString);
+        return 'N/A';
+    }
+}
 
         function formatLastSubmissionTime(isoString) {
-            if (!isoString) return 'No data yet';
-            try {
-                const date = new Date(isoString);
-                if (isNaN(date.getTime())) return 'No data yet';
-                
-                // Same logic as formatPKTTime
-                const pstDate = new Date(date.getTime() - (8 * 60 * 60 * 1000));
-                
-                const month = pstDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-                const day = pstDate.getUTCDate();
-                const hour = pstDate.getUTCHours();
-                const minute = pstDate.getUTCMinutes().toString().padStart(2, '0');
-                
-                return `${month} ${day}, ${hour}:${minute}`;
-            } catch (e) {
-                console.error("Error formatting last submission:", e);
-                return 'No data yet';
-            }
-        }
+    if (!isoString) return 'No data yet';
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return 'No data yet';
+        
+        // CHANGE: ADD 8 hours instead of subtracting
+        const pstDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
+        
+        const month = pstDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+        const day = pstDate.getUTCDate();
+        const hour = pstDate.getUTCHours();
+        const minute = pstDate.getUTCMinutes().toString().padStart(2, '0');
+        
+        return `${month} ${day}, ${hour}:${minute}`;
+    } catch (e) {
+        console.error("Error formatting last submission:", e);
+        return 'No data yet';
+    }
+}
 
         function formatDuration(seconds) {
             if (!seconds || seconds === 0) return "0:00";
