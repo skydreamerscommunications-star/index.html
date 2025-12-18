@@ -780,4 +780,231 @@
             });
             
             // Calculate totals
-            const totalSubmissions = sortedD
+            const totalSubmissions = sortedDIDs.reduce((sum, [_, stats]) => sum + (stats.submissions || 0), 0);
+            const totalQualified = sortedDIDs.reduce((sum, [_, stats]) => sum + (stats.qualified || 0), 0);
+            const totalNotQualified = sortedDIDs.reduce((sum, [_, stats]) => sum + (stats.notQualified || 0), 0);
+            
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="py-3 px-4">TOTALS</td>
+                    <td class="py-3 px-4"></td>
+                    <td class="py-3 px-4">${totalSubmissions}</td>
+                    <td class="py-3 px-4">${totalQualified}</td>
+                    <td class="py-3 px-4">${totalNotQualified}</td>
+                    <td class="py-3 px-4"></td>
+                    <td class="py-3 px-4"></td>
+                </tr>
+            `;
+        }
+
+        // Render live submissions - FIXED
+        function renderLiveSubmissions() {
+            const tbody = document.getElementById('liveSubmissionsBody');
+            tbody.innerHTML = '';
+            
+            if (!rawSubmissionsData || !rawSubmissionsData.submissions || rawSubmissionsData.submissions.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-8 text-center text-gray-500">
+                            <i class="fas fa-database text-2xl mb-2 text-gray-300"></i><br>
+                            Loading live submissions...
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const submissions = rawSubmissionsData.submissions;
+            
+            submissions.forEach((sub, index) => {
+                const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                
+                // FIX: Use formatPKTTime for timestamp
+                const timestamp = sub.timestamp ? formatPKTTime(sub.timestamp) : 'N/A';
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass} hover:bg-blue-50 transition-colors duration-150">
+                        <td class="py-3 px-4 text-xs">${timestamp}</td>
+                        <td class="py-3 px-4">${sub.agent || 'Unknown'}</td>
+                        <td class="py-3 px-4 text-sm">${sub.did || 'N/A'}</td>
+                        <td class="py-3 px-4">${sub.state || 'N/A'}</td>
+                        <td class="py-3 px-4">${sub.campaign || 'Unknown'}</td>
+                        <td class="py-3 px-4">${formatDuration(sub.duration || 0)}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-1 rounded text-xs font-medium ${
+                                sub.disposition === 'Qualified' ? 'bg-green-100 text-green-800' :
+                                sub.disposition === 'Not Qualified' ? 'bg-red-100 text-red-800' :
+                                sub.disposition === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                                sub.disposition === 'Call Back' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'
+                            }">
+                                ${sub.disposition || 'Unknown'}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Render campaigns - FIXED
+        function renderCampaigns() {
+            const tbody = document.getElementById('campaignsBody');
+            const tfoot = document.getElementById('campaignsTotal');
+            tbody.innerHTML = '';
+            
+            if (!dashboardData.campaigns || Object.keys(dashboardData.campaigns).length === 0) {
+                tbody.innerHTML = `
+                    <tr class="bg-white">
+                        <td colspan="4" class="py-8 text-center text-gray-500">
+                            <i class="fas fa-chart-bar text-2xl mb-2 text-gray-300"></i><br>
+                            No campaign data available
+                        </td>
+                    </tr>
+                `;
+                tfoot.innerHTML = '';
+                return;
+            }
+            
+            Object.entries(dashboardData.campaigns).forEach(([name, stats], index) => {
+                tbody.innerHTML += `
+                    <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-green-50 transition-colors duration-150">
+                        <td class="py-2 px-3 font-medium">${name}</td>
+                        <td class="py-2 px-3">${stats.submissions || 0}</td>
+                        <td class="py-2 px-3 font-bold text-green-600">${stats.qualified || 0}</td>
+                        <td class="py-2 px-3">${(stats.fph || 0).toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            const summary = dashboardData.summary || {};
+            tfoot.innerHTML = `
+                <tr>
+                    <td class="py-2 px-3">TOTALS</td>
+                    <td class="py-2 px-3">${summary.submissions || 0}</td>
+                    <td class="py-2 px-3">${summary.qualified || 0}</td>
+                    <td class="py-2 px-3">${(summary.fph || 0).toFixed(2)}</td>
+                </tr>
+            `;
+        }
+
+        // Render top states - FIXED
+        function renderTopStates() {
+            const container = document.getElementById('topStatesBody');
+            container.innerHTML = '';
+            
+            if (!dashboardData.states || Object.keys(dashboardData.states).length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 text-center py-4 text-gray-500">
+                        <i class="fas fa-map text-xl mb-1 text-gray-300"></i><br>
+                        <span class="text-sm">No state data</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedStates = Object.entries(dashboardData.states)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 4);
+            
+            sortedStates.forEach(([state, volume]) => {
+                container.innerHTML += `
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-3 text-center shadow hover:shadow-md transition-shadow duration-300">
+                        <div class="text-xl font-bold mb-1">${volume}</div>
+                        <div class="text-xs font-medium">${state}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Render states in modal - FIXED
+        function renderStates() {
+            const container = document.getElementById('statesBody');
+            container.innerHTML = '';
+            
+            if (!dashboardData.states || Object.keys(dashboardData.states).length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-3 text-center py-8 text-gray-500">
+                        <i class="fas fa-map-marked-alt text-2xl mb-2 text-gray-300"></i><br>
+                        No state traffic data available
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedStates = Object.entries(dashboardData.states)
+                .sort((a, b) => b[1] - a[1]);
+            
+            const maxVolume = Math.max(...Object.values(dashboardData.states));
+            
+            sortedStates.forEach(([state, volume]) => {
+                const percentage = maxVolume > 0 ? Math.round((volume / maxVolume) * 100) : 0;
+                
+                container.innerHTML += `
+                    <div class="bg-white rounded-lg p-3 border border-gray-200 shadow hover:shadow-md transition-all duration-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <div class="font-bold text-gray-800">${state}</div>
+                                <div class="text-xs text-gray-500">State Volume</div>
+                            </div>
+                            <div class="text-xl font-bold text-blue-600">${volume}</div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-1.5 rounded-full" 
+                                 style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="text-right text-xs text-gray-500 mt-1">${percentage}% of peak</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Modal functions
+        function openTrafficModal() {
+            renderStates();
+            document.getElementById('trafficModal').classList.remove('hidden');
+            document.getElementById('trafficModal').classList.add('flex');
+        }
+
+        function closeTrafficModal() {
+            document.getElementById('trafficModal').classList.add('hidden');
+            document.getElementById('trafficModal').classList.remove('flex');
+        }
+
+        // Firebase listeners - FIXED
+        firebase.database().ref("dashboard/live").on("value", snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                dashboardData = processFirebaseData(data);
+                console.log("Dashboard data loaded:", dashboardData);
+                renderAllData();
+            }
+        });
+
+        // Load raw submissions data
+        firebase.database().ref("dashboard/raw").on("value", snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                rawSubmissionsData = data;
+                console.log("Raw submissions loaded:", rawSubmissionsData);
+                if (currentView === 'submissions') {
+                    renderLiveSubmissions();
+                }
+            }
+        });
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default filter button as active
+            document.querySelector('.campaign-btn.active').click();
+            document.querySelector('.view-btn.active').click();
+        });
+
+        // Close modal on outside click
+        document.getElementById('trafficModal').addEventListener('click', (e) => {
+            if (e.target.id === 'trafficModal') {
+                closeTrafficModal();
+            }
+        });
+    </script>
+</body>
+</html>
