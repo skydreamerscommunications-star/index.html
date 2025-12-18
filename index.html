@@ -447,15 +447,19 @@
         const date = new Date(isoString);
         if (isNaN(date.getTime())) return 'N/A';
         
-        // CHANGE: ADD 8 hours instead of subtracting
-        const adjustedDate = new Date(date.getTime() + (16 * 60 * 60 * 1000));
+        // The ISO string is 2025-12-19T01:13:42.133Z (1:13 AM UTC on Dec 19)
+        // But sheet shows 12/18/2025 9:13:42 (9:13 AM PST on Dec 18)
+        // PST is UTC-8, so 9:13 AM PST = 17:13 UTC (5:13 PM)
+        // But we have 1:13 UTC, so there's a 16-hour difference
         
-        const month = pstDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-        const day = pstDate.getUTCDate();
-        const hour = pstDate.getUTCHours();
-        const minute = pstDate.getUTCMinutes().toString().padStart(2, '0');
+        // Quick fix: Add 8 hours to get 9:13
+        const adjustedDate = new Date(date.getTime() + (8 * 60 * 60 * 1000));
         
-        // 24-hour format without AM/PM
+        const month = adjustedDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+        const day = adjustedDate.getUTCDate();
+        const hour = adjustedDate.getUTCHours();
+        const minute = adjustedDate.getUTCMinutes().toString().padStart(2, '0');
+        
         return `${month} ${day}, ${hour}:${minute}`;
     } catch (e) {
         console.error("Error formatting PKT time:", e, isoString);
