@@ -1,265 +1,692 @@
 <!DOCTYPE html>
-<html class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sky Dreamers • Realtime Performance Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Dreamers • Performance Intelligence Platform</title>
     
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#1e3a8a',
-                        'secondary': '#1e40af',
-                        'accent': '#10b981',
-                        'dark-bg': '#0f172a',
-                    },
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
-        /* Custom scrollbar for professional look */
-        .table-container::-webkit-scrollbar {
-            width: 8px;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --dark: #1e293b;
+            --light: #f8fafc;
         }
-        .table-container::-webkit-scrollbar-track {
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
             background: #f1f5f9;
+            border-radius: 10px;
         }
-        .table-container::-webkit-scrollbar-thumb {
+        
+        ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 4px;
+            border-radius: 10px;
         }
-        .table-container::-webkit-scrollbar-thumb:hover {
+        
+        ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
         
-        /* Smooth table row hover */
-        tr:hover {
-            transform: scale(1.01);
+        /* Glow effects */
+        .glow-success {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
         }
         
-        /* Custom animations */
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            50% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
         }
-        .pulse-glow {
+        
+        .glow-danger {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Gradient backgrounds */
+        .gradient-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .gradient-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .gradient-purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .gradient-orange {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+        
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(37, 99, 235, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(37, 99, 235, 0.5); }
+        }
+        
+        .animate-pulse-glow {
             animation: pulse-glow 2s infinite;
+        }
+        
+        /* Table hover effects */
+        .table-row-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+        }
+        
+        /* Badge styles */
+        .badge-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .badge-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .badge-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        /* State badges */
+        .state-badge {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
         }
     </style>
 </head>
-
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen font-sans antialiased">
-    
+<body class="min-h-screen">
     <!-- Header -->
-    <header class="bg-gradient-to-r from-primary to-secondary text-white shadow-2xl border-b-4 border-blue-500 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                    <span class="text-2xl font-bold">✈️</span>
+    <header class="gradient-primary text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Sky Dreamers</h1>
+                        <p class="text-blue-100 text-sm font-medium">Performance Intelligence Platform</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-3xl md:text-4xl font-black tracking-tight leading-tight">
-                        Sky Dreamers
-                    </h1>
-                    <p class="text-blue-100 text-sm font-medium opacity-90">Realtime Performance Hub</p>
+                
+                <div class="flex flex-col items-end">
+                    <div class="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+                        <i class="fas fa-clock text-blue-200"></i>
+                        <div class="text-right">
+                            <div class="text-sm text-blue-100">Last Submission</div>
+                            <div id="lastSubmissionTime" class="font-bold text-white">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs text-blue-200">
+                        <i class="fas fa-sync-alt mr-1"></i>
+                        <span>Auto-refresh every 30 seconds</span>
+                    </div>
                 </div>
-            </div>
-            <div class="text-right space-y-1">
-                <div id="lastSubmissionTime" class="text-lg font-bold bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/20">
-                    LAST SUBMISSION • N/A
-                </div>
-                <div class="text-xs opacity-75 font-medium tracking-wide uppercase">Live • Auto-refreshing</div>
             </div>
         </div>
     </header>
 
-    <!-- Filters -->
-    <div class="max-w-7xl mx-auto px-6 py-8">
-        <div class="flex flex-wrap justify-center gap-3 mb-12" id="campaignFilters">
-            <button class="filter-btn group active px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-2 border-emerald-400/50 backdrop-blur-sm" data-campaign="All">
-                <span>All Campaigns</span>
-                <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-            </button>
-            <button class="filter-btn group px-6 py-3 bg-white/70 hover:bg-white text-slate-800 font-semibold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-2 border-slate-200 backdrop-blur-sm" data-campaign="Auto">
-                Auto
-            </button>
-            <button class="filter-btn group px-6 py-3 bg-white/70 hover:bg-white text-slate-800 font-semibold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-2 border-slate-200 backdrop-blur-sm" data-campaign="MVA">
-                MVA
-            </button>
-            <button class="filter-btn group px-6 py-3 bg-white/70 hover:bg-white text-slate-800 font-semibold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-2 border-slate-200 backdrop-blur-sm" data-campaign="Medicare">
-                Medicare
-            </button>
-            <button class="filter-btn group px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-2 border-orange-400/50 backdrop-blur-sm" id="liveTrafficBtn" data-campaign="Live Traffic">
-                Live Traffic
-            </button>
-        </div>
-
-        <!-- KPI Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-12">
-            <div class="card kpi-card bg-gradient-to-br from-blue-500 to-blue-600 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 border border-blue-400/30 backdrop-blur-xl" id="submissions-card">
-                <div class="text-3xl md:text-4xl font-black mb-2" id="submissions">0</div>
-                <div class="text-sm font-semibold uppercase tracking-wider opacity-90">Submissions</div>
-            </div>
-            <div class="card kpi-card bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 border border-emerald-400/30 backdrop-blur-xl pulse-glow" id="qualified-card">
-                <div class="text-3xl md:text-4xl font-black mb-2" id="qualified">0</div>
-                <div class="text-sm font-semibold uppercase tracking-wider opacity-90">Qualified</div>
-            </div>
-            <div class="card kpi-card bg-gradient-to-br from-red-500 to-rose-600 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 border border-red-400/30 backdrop-blur-xl" id="notQualified-card">
-                <div class="text-3xl md:text-4xl font-black mb-2" id="notQualified">0</div>
-                <div class="text-sm font-semibold uppercase tracking-wider opacity-90">Not Qualified</div>
-            </div>
-            <div class="card kpi-card bg-gradient-to-br from-amber-500 to-yellow-500 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 border border-amber-400/30 backdrop-blur-xl" id="pending-card">
-                <div class="text-3xl md:text-4xl font-black mb-2" id="pending">0</div>
-                <div class="text-sm font-semibold uppercase tracking-wider opacity-90">Pending</div>
-            </div>
-            <div class="card kpi-card bg-gradient-to-br from-purple-500 to-violet-600 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 border border-purple-400/30 backdrop-blur-xl" id="fph-card">
-                <div class="text-3xl md:text-4xl font-black mb-2" id="fph">0.00</div>
-                <div class="text-sm font-semibold uppercase tracking-wider opacity-90">FPH</div>
-            </div>
-            <div class="card kpi-card bg-gradient-to-br from-orange-500 to-red-500 text-white p-8 rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-500 border border-orange-400/30 backdrop-blur-xl" id="sph-card">
-                <div class="text-3xl md:text-4xl font-black mb-2" id="sph">0.00</div>
-                <div class="text-sm font-semibold uppercase tracking-wider opacity-90">SPH</div>
+    <!-- Main Container -->
+    <main class="container mx-auto px-4 py-6 max-w-7xl">
+        <!-- Campaign Filters -->
+        <div class="mb-8">
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button onclick="setFilter('All')" class="campaign-btn active bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <i class="fas fa-globe-americas mr-2"></i>All Campaigns
+                </button>
+                <button onclick="setFilter('Auto')" class="campaign-btn bg-white text-gray-700 border-2 border-blue-200 px-6 py-3 rounded-xl font-semibold shadow hover:shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-blue-400">
+                    <i class="fas fa-car mr-2"></i>Auto
+                </button>
+                <button onclick="setFilter('MVA')" class="campaign-btn bg-white text-gray-700 border-2 border-blue-200 px-6 py-3 rounded-xl font-semibold shadow hover:shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-blue-400">
+                    <i class="fas fa-ambulance mr-2"></i>MVA
+                </button>
+                <button onclick="setFilter('Medicare')" class="campaign-btn bg-white text-gray-700 border-2 border-blue-200 px-6 py-3 rounded-xl font-semibold shadow hover:shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-blue-400">
+                    <i class="fas fa-heartbeat mr-2"></i>Medicare
+                </button>
+                <button onclick="openTrafficModal()" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <i class="fas fa-traffic-light mr-2"></i>Live Traffic
+                </button>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="grid lg:grid-cols-3 gap-8">
-            <!-- Agents Table -->
+        <!-- Metrics Dashboard -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-tachometer-alt mr-3 text-blue-500"></i>Performance Metrics
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+                <!-- Submissions -->
+                <div class="gradient-primary text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-blue-100 font-medium mb-2">Submissions</p>
+                            <h3 id="submissions" class="text-4xl font-bold">0</h3>
+                        </div>
+                        <i class="fas fa-file-alt text-3xl text-white/70"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/20">
+                        <div class="flex items-center">
+                            <i class="fas fa-bolt text-yellow-300 mr-2"></i>
+                            <span id="fph" class="text-lg font-bold">0.00</span>
+                            <span class="text-blue-100 ml-2">FPH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Qualified -->
+                <div class="gradient-success text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-emerald-100 font-medium mb-2">Qualified</p>
+                            <h3 id="qualified" class="text-4xl font-bold">0</h3>
+                        </div>
+                        <i class="fas fa-check-circle text-3xl text-white/70"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/20">
+                        <div class="flex items-center">
+                            <i class="fas fa-bolt text-yellow-300 mr-2"></i>
+                            <span id="sph" class="text-lg font-bold">0.00</span>
+                            <span class="text-emerald-100 ml-2">SPH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Not Qualified -->
+                <div class="gradient-danger text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-red-100 font-medium mb-2">Not Qualified</p>
+                            <h3 id="notQualified" class="text-4xl font-bold">0</h3>
+                        </div>
+                        <i class="fas fa-times-circle text-3xl text-white/70"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/20">
+                        <div class="text-red-100 text-sm">Quality Control</div>
+                    </div>
+                </div>
+
+                <!-- Pending -->
+                <div class="gradient-warning text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-amber-100 font-medium mb-2">Pending</p>
+                            <h3 id="pending" class="text-4xl font-bold">0</h3>
+                        </div>
+                        <i class="fas fa-clock text-3xl text-white/70"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/20">
+                        <div class="text-amber-100 text-sm">Awaiting Review</div>
+                    </div>
+                </div>
+
+                <!-- Avg Talk Time -->
+                <div class="gradient-purple text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-purple-100 font-medium mb-2">Avg Talk Time</p>
+                            <h3 id="avgTalkTime" class="text-4xl font-bold">0:00</h3>
+                        </div>
+                        <i class="fas fa-phone-alt text-3xl text-white/70"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/20">
+                        <div class="text-purple-100 text-sm">Efficiency Metric</div>
+                    </div>
+                </div>
+
+                <!-- Callback -->
+                <div class="gradient-orange text-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 transform">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-orange-100 font-medium mb-2">Call Back</p>
+                            <h3 id="callback" class="text-4xl font-bold">0</h3>
+                        </div>
+                        <i class="fas fa-redo text-3xl text-white/70"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/20">
+                        <div class="text-orange-100 text-sm">Follow-up Required</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Agent Performance (2/3 width) -->
             <div class="lg:col-span-2">
-                <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/50 p-8">
-                    <h3 id="agentsTitle" class="text-2xl font-black text-slate-900 mb-8 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent pb-4 border-b-4 border-emerald-500/30">Agents Performance</h3>
-                    <div class="table-container max-h-96 overflow-hidden rounded-2xl border-4 border-slate-200/50">
-                        <table class="w-full bg-white/50 backdrop-blur-xl">
-                            <thead class="sticky top-0 bg-gradient-to-r from-slate-900 to-slate-800 text-white shadow-2xl z-10">
-                                <tr>
-                                    <th class="px-6 py-5 text-left font-black uppercase tracking-wider text-xs">Agent</th>
-                                    <th class="px-4 py-5 text-center font-black uppercase tracking-wider text-xs">Subs</th>
-                                    <th class="px-4 py-5 text-center font-black uppercase tracking-wider text-xs">Qual</th>
-                                    <th class="px-4 py-5 text-center font-black uppercase tracking-wider text-xs">FPH</th>
-                                    <th class="px-4 py-5 text-center font-black uppercase tracking-wider text-xs">SPH</th>
-                                    <th class="px-4 py-5 text-center font-black uppercase tracking-wider text-xs">Avg TT</th>
-                                    <th class="px-6 py-5 text-center font-black uppercase tracking-wider text-xs">Last Form</th>
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="agentsTitle" class="text-2xl font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-users mr-3 text-blue-500"></i>Agent Performance
+                        </h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">Sorted by:</span>
+                            <select class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                                <option>Qualified Leads</option>
+                                <option>Submissions</option>
+                                <option>FPH</option>
+                                <option>SPH</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto rounded-xl border border-gray-200">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr class="text-left text-sm font-semibold text-gray-700">
+                                    <th class="py-4 px-6">Agent</th>
+                                    <th class="py-4 px-6">Subs</th>
+                                    <th class="py-4 px-6">Qualified</th>
+                                    <th class="py-4 px-6">Not Qual</th>
+                                    <th class="py-4 px-6">FPH</th>
+                                    <th class="py-4 px-6">SPH</th>
+                                    <th class="py-4 px-6">Last Call</th>
                                 </tr>
                             </thead>
-                            <tbody id="agentsBody" class="divide-y divide-slate-200/50"></tbody>
-                            <tfoot id="agentsTotal"></tfoot>
+                            <tbody id="agentsBody" class="divide-y divide-gray-200">
+                                <!-- Data will be inserted here -->
+                            </tbody>
+                            <tfoot id="agentsTotal" class="bg-blue-50 font-bold">
+                                <!-- Totals row will be inserted here -->
+                            </tfoot>
                         </table>
+                    </div>
+                    
+                    <div class="mt-4 text-sm text-gray-500 flex items-center">
+                        <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                        <span>Click on any agent row for detailed performance breakdown</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Sidebar -->
+            <!-- Sidebar (1/3 width) -->
             <div class="space-y-8">
-                <!-- Campaigns Table -->
-                <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/50 p-8">
-                    <h3 class="text-xl font-black text-slate-900 mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent pb-3 border-b-2 border-blue-500/30">Campaigns</h3>
-                    <table class="w-full bg-white/50 backdrop-blur-xl rounded-2xl overflow-hidden border-2 border-slate-200/50">
-                        <thead class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                            <tr>
-                                <th class="px-6 py-4 text-left font-bold uppercase tracking-wider text-xs">Campaign</th>
-                                <th class="px-4 py-4 text-center font-bold uppercase tracking-wider text-xs">Subs</th>
-                                <th class="px-4 py-4 text-center font-bold uppercase tracking-wider text-xs">Qual</th>
-                                <th class="px-6 py-4 text-center font-bold uppercase tracking-wider text-xs">FPH</th>
-                            </tr>
-                        </thead>
-                        <tbody id="campaignsBody" class="divide-y divide-slate-200/50"></tbody>
-                        <tfoot id="campaignsTotal"></tfoot>
-                    </table>
+                <!-- Campaign Performance -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-chart-bar mr-3 text-green-500"></i>Campaign Performance
+                    </h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr class="text-left text-sm font-semibold text-gray-700">
+                                    <th class="py-3 px-4">Campaign</th>
+                                    <th class="py-3 px-4">Subs</th>
+                                    <th class="py-3 px-4">Qual</th>
+                                    <th class="py-3 px-4">FPH</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaignsBody" class="divide-y divide-gray-100">
+                                <!-- Data will be inserted here -->
+                            </tbody>
+                            <tfoot id="campaignsTotal" class="bg-green-50 font-bold">
+                                <!-- Totals row will be inserted here -->
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Top States -->
-                <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/50 p-8">
-                    <h4 class="text-lg font-black text-slate-900 mb-6 bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent pb-2 border-b-2 border-purple-500/30">Top States</h4>
-                    <div class="grid grid-cols-3 gap-4" id="topStatesBody"></div>
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-3 text-red-500"></i>Top States
+                        </h2>
+                        <span class="text-sm font-medium text-gray-500">Volume</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="topStatesBody">
+                            <!-- State badges will be inserted here -->
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-100">
+                        <button onclick="openTrafficModal()" class="w-full py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300">
+                            <i class="fas fa-expand mr-2"></i>View All States
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <!-- Live Traffic Sidebar -->
-    <div class="fixed top-0 right-0 w-80 h-full bg-white/95 backdrop-blur-2xl shadow-2xl transform translate-x-full transition-transform duration-500 ease-in-out z-50 border-l-4 border-blue-500/50" id="liveTrafficSidebar">
-        <div class="p-8 h-full overflow-y-auto">
-            <div class="flex items-center justify-between mb-8 pb-6 border-b-2 border-blue-200">
-                <h3 class="text-2xl font-black bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Live Traffic</h3>
-                <button onclick="closeSidebar()" class="text-3xl font-bold text-slate-500 hover:text-red-500 transition-colors p-2 -m-2 rounded-xl hover:bg-red-50">
-                    ×
+    <!-- Live Traffic Modal -->
+    <div id="trafficModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div class="gradient-primary text-white p-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <i class="fas fa-traffic-light mr-3"></i>Live Traffic Analysis
+                    </h2>
+                    <p class="text-blue-100 mt-1">Real-time state volume distribution</p>
+                </div>
+                <button onclick="closeTrafficModal()" class="text-white hover:text-gray-200 text-2xl">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-            <table class="w-full rounded-2xl overflow-hidden border-4 border-slate-200/50 bg-white/70 backdrop-blur-xl">
-                <thead class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-                    <tr>
-                        <th class="px-6 py-4 text-left font-bold uppercase tracking-wider text-xs">State</th>
-                        <th class="px-6 py-4 text-right font-bold uppercase tracking-wider text-xs">Volume</th>
-                    </tr>
-                </thead>
-                <tbody id="statesBody" class="divide-y divide-slate-200/50"></tbody>
-            </table>
+            
+            <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="statesBody">
+                    <!-- State cards will be inserted here -->
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="text-center text-gray-600 text-sm">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Data updates in real-time from call center activity
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="mt-24 bg-gradient-to-r from-slate-900 to-slate-800 text-slate-300 py-12 border-t-4 border-blue-500/30">
-        <div class="max-w-7xl mx-auto px-6 text-center">
-            <div class="text-2xl mb-4">🚀 Sky Dreamers</div>
-            <p class="text-lg font-semibold opacity-90 mb-2">Driving Performance Excellence</p>
-            <p class="text-sm opacity-75">© 2025 • Realtime Dashboard V1.2</p>
+    <footer class="mt-12 bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-xl font-bold mb-2">Sky Dreamers</h3>
+                    <p class="text-gray-400">Performance Intelligence Platform v2.0</p>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <div class="text-gray-400 mb-2">© 2025 Sky Dreamers. All rights reserved.</div>
+                    <div class="flex space-x-4 text-sm text-gray-400">
+                        <span><i class="fas fa-shield-alt mr-1"></i> Secure Dashboard</span>
+                        <span><i class="fas fa-bolt mr-1"></i> Real-time Updates</span>
+                        <span><i class="fas fa-chart-line mr-1"></i> Advanced Analytics</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script>
-        // Your existing JavaScript remains exactly the same - no changes needed!
-        let dashboardData = null;
-        let currentFilter = 'All';
-
-        // All your existing functions (formatPKTTime, renderDashboard, etc.) go here unchanged...
-        // [Paste your entire existing <script> content here - it's fully compatible]
-
-        // Firebase initialization and all event listeners remain identical
+        // Initialize Firebase
         firebase.initializeApp({
             databaseURL: "https://performance-dashboard-c7017-default-rtdb.firebaseio.com"
         });
 
-        // [Include all your existing JavaScript functions here - they work perfectly with Tailwind]
-        
-        // Filter button active states
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (this.dataset.campaign === 'Live Traffic') {
-                    openSidebar();
-                    return;
-                }
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentFilter = this.dataset.campaign;
-                if (dashboardData) renderAllPanels(currentFilter);
+        let dashboardData = null;
+        let currentFilter = 'All';
+
+        // Formatting helpers
+        function formatPKTTime(isoString) {
+            if (!isoString) return 'N/A';
+            const date = new Date(isoString);
+            return date.toLocaleString('en-US', {
+                month: 'short', day: 'numeric',
+                hour: 'numeric', minute: '2-digit',
+                hour12: true, timeZone: 'Asia/Karachi'
             });
+        }
+
+        function formatTimeOnly(isoString) {
+            if (!isoString) return '--:--';
+            const date = new Date(isoString);
+            return date.toLocaleString('en-US', {
+                hour: 'numeric', minute: '2-digit',
+                hour12: true, timeZone: 'Asia/Karachi'
+            });
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Filter management
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.campaign-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700', 'border-2', 'border-blue-200');
+            });
+            
+            event.currentTarget.classList.remove('bg-white', 'text-gray-700', 'border-2', 'border-blue-200');
+            event.currentTarget.classList.add('active', 'bg-gradient-to-r', 'from-blue-500', 'to-blue-600', 'text-white');
+            
+            if (dashboardData) {
+                renderDashboard(dashboardData);
+            }
+        }
+
+        // Render functions
+        function renderDashboard(data) {
+            if (!data || !data.summary) return;
+            dashboardData = data;
+
+            // Update time
+            document.getElementById('lastSubmissionTime').textContent = 
+                formatPKTTime(data.lastSubmission) || 'No data yet';
+
+            // Update metrics
+            const summary = data.summary;
+            document.getElementById('submissions').textContent = summary.submissions || 0;
+            document.getElementById('qualified').textContent = summary.qualified || 0;
+            document.getElementById('notQualified').textContent = summary.notQualified || 0;
+            document.getElementById('pending').textContent = summary.pending || 0;
+            document.getElementById('callback').textContent = summary.callback || 0;
+            document.getElementById('fph').textContent = (summary.fph || 0).toFixed(2);
+            document.getElementById('sph').textContent = (summary.sph || 0).toFixed(2);
+            document.getElementById('avgTalkTime').textContent = formatDuration(summary.avgTalkTime);
+
+            // Render agents
+            renderAgents(data.agents || {}, currentFilter);
+
+            // Render campaigns
+            renderCampaigns(data.campaigns || {}, summary);
+
+            // Render states
+            renderStates(data.states || {});
+            renderTopStates(data.states || {});
+        }
+
+        function renderAgents(agents, filter) {
+            const tbody = document.getElementById('agentsBody');
+            const tfoot = document.getElementById('agentsTotal');
+            tbody.innerHTML = '';
+            
+            // Sort agents by qualified
+            const sortedAgents = Object.entries(agents).sort((a, b) => b[1].qualified - a[1].qualified);
+            
+            sortedAgents.forEach(([name, stats], index) => {
+                const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                const rankClass = index < 3 ? 'font-bold text-green-600' : '';
+                
+                tbody.innerHTML += `
+                    <tr class="${rowClass} table-row-hover hover:bg-blue-50 transition-colors duration-200">
+                        <td class="py-4 px-6 font-medium ${rankClass}">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">
+                                    ${index + 1}
+                                </div>
+                                ${name}
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">${stats.submissions || 0}</td>
+                        <td class="py-4 px-6 font-bold text-green-600">${stats.qualified || 0}</td>
+                        <td class="py-4 px-6 text-red-500">${stats.notQualified || 0}</td>
+                        <td class="py-4 px-6 font-medium">${(stats.fph || 0).toFixed(2)}</td>
+                        <td class="py-4 px-6 font-medium">${(stats.sph || 0).toFixed(2)}</td>
+                        <td class="py-4 px-6 text-gray-500">${formatTimeOnly(stats.lastSubmission)}</td>
+                    </tr>
+                `;
+            });
+            
+            // Calculate totals
+            const totalSubmissions = sortedAgents.reduce((sum, [_, stats]) => sum + (stats.submissions || 0), 0);
+            const totalQualified = sortedAgents.reduce((sum, [_, stats]) => sum + (stats.qualified || 0), 0);
+            const totalNotQualified = sortedAgents.reduce((sum, [_, stats]) => sum + (stats.notQualified || 0), 0);
+            const avgFPH = totalSubmissions > 0 ? (sortedAgents.reduce((sum, [_, stats]) => sum + (stats.fph || 0), 0) / sortedAgents.length).toFixed(2) : '0.00';
+            const avgSPH = totalQualified > 0 ? (sortedAgents.reduce((sum, [_, stats]) => sum + (stats.sph || 0), 0) / sortedAgents.length).toFixed(2) : '0.00';
+            
+            tfoot.innerHTML = `
+                <tr class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                    <td class="py-4 px-6 font-bold">TOTALS (${filter})</td>
+                    <td class="py-4 px-6 font-bold">${totalSubmissions}</td>
+                    <td class="py-4 px-6 font-bold">${totalQualified}</td>
+                    <td class="py-4 px-6 font-bold">${totalNotQualified}</td>
+                    <td class="py-4 px-6 font-bold">${avgFPH}</td>
+                    <td class="py-4 px-6 font-bold">${avgSPH}</td>
+                    <td class="py-4 px-6"></td>
+                </tr>
+            `;
+            
+            // Update title
+            document.getElementById('agentsTitle').innerHTML = `
+                <i class="fas fa-users mr-3 text-blue-500"></i>
+                Agent Performance (${filter}) - ${sortedAgents.length} Agents
+            `;
+        }
+
+        function renderCampaigns(campaigns, summary) {
+            const tbody = document.getElementById('campaignsBody');
+            const tfoot = document.getElementById('campaignsTotal');
+            tbody.innerHTML = '';
+            
+            Object.entries(campaigns).forEach(([name, stats], index) => {
+                tbody.innerHTML += `
+                    <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-green-50 transition-colors duration-200">
+                        <td class="py-3 px-4 font-medium">${name}</td>
+                        <td class="py-3 px-4">${stats.submissions || 0}</td>
+                        <td class="py-3 px-4 font-bold text-green-600">${stats.qualified || 0}</td>
+                        <td class="py-3 px-4">${(stats.fph || 0).toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            tfoot.innerHTML = `
+                <tr class="bg-gradient-to-r from-green-500 to-green-600 text-white font-bold">
+                    <td class="py-3 px-4">TOTALS</td>
+                    <td class="py-3 px-4">${summary.submissions || 0}</td>
+                    <td class="py-3 px-4">${summary.qualified || 0}</td>
+                    <td class="py-3 px-4">${(summary.fph || 0).toFixed(2)}</td>
+                </tr>
+            `;
+        }
+
+        function renderTopStates(states) {
+            const container = document.getElementById('topStatesBody');
+            container.innerHTML = '';
+            
+            const sortedStates = Object.entries(states)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 6);
+            
+            sortedStates.forEach(([state, volume]) => {
+                container.innerHTML += `
+                    <div class="state-badge rounded-xl p-3 text-center shadow hover:shadow-lg transition-shadow duration-300">
+                        <div class="text-2xl font-bold mb-1">${volume}</div>
+                        <div class="text-sm font-medium">${state}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderStates(states) {
+            const container = document.getElementById('statesBody');
+            container.innerHTML = '';
+            
+            const sortedStates = Object.entries(states)
+                .sort((a, b) => b[1] - a[1]);
+            
+            sortedStates.forEach(([state, volume]) => {
+                const percentage = Math.round((volume / Math.max(...Object.values(states))) * 100);
+                
+                container.innerHTML += `
+                    <div class="bg-white rounded-xl p-4 border border-gray-200 shadow hover:shadow-md transition-all duration-300">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <div class="text-lg font-bold text-gray-800">${state}</div>
+                                <div class="text-sm text-gray-500">State Volume</div>
+                            </div>
+                            <div class="text-2xl font-bold text-blue-600">${volume}</div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full" 
+                                 style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="text-right text-sm text-gray-500 mt-1">${percentage}% of peak</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Modal functions
+        function openTrafficModal() {
+            document.getElementById('trafficModal').classList.remove('hidden');
+            document.getElementById('trafficModal').classList.add('flex');
+        }
+
+        function closeTrafficModal() {
+            document.getElementById('trafficModal').classList.add('hidden');
+            document.getElementById('trafficModal').classList.remove('flex');
+        }
+
+        // Firebase listener
+        firebase.database().ref("dashboard/live").on("value", snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                renderDashboard(data);
+            }
         });
 
-        function openSidebar() {
-            document.getElementById('liveTrafficSidebar').classList.remove('translate-x-full');
-        }
-        function closeSidebar() {
-            document.getElementById('liveTrafficSidebar').classList.add('translate-x-full');
-        }
+        // Set default filter button as active
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.campaign-btn.active').click();
+        });
 
-        // Firebase listener (unchanged)
-        firebase.database().ref("dashboard/live").on("value", snap => {
-            const data = snap.val();
-            if (data) renderDashboard(data);
+        // Close modal on outside click
+        document.getElementById('trafficModal').addEventListener('click', (e) => {
+            if (e.target.id === 'trafficModal') {
+                closeTrafficModal();
+            }
         });
     </script>
 </body>
