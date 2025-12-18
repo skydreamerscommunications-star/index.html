@@ -780,50 +780,60 @@
         }
 
         // Render live submissions - FIXED
-        function renderLiveSubmissions() {
-            const tbody = document.getElementById('liveSubmissionsBody');
-            tbody.innerHTML = '';
-            
-            if (!rawSubmissionsData || !rawSubmissionsData.submissions || rawSubmissionsData.submissions.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="py-8 text-center text-gray-500">
-                            <i class="fas fa-database text-2xl mb-2 text-gray-300"></i><br>
-                            Loading live submissions...
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            const submissions = rawSubmissionsData.submissions;
-            
-            submissions.forEach((sub, index) => {
-                const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-                
-                tbody.innerHTML += `
-                    <tr class="${rowClass} hover:bg-blue-50 transition-colors duration-150">
-                        <td class="py-3 px-4 text-xs">${formatDateTime(sub.timestamp)}</td>
-                        <td class="py-3 px-4">${sub.agent || 'Unknown'}</td>
-                        <td class="py-3 px-4 text-sm">${sub.did || 'N/A'}</td>
-                        <td class="py-3 px-4">${sub.state || 'N/A'}</td>
-                        <td class="py-3 px-4">${sub.campaign || 'Unknown'}</td>
-                        <td class="py-3 px-4">${formatDuration(sub.duration || 0)}</td>
-                        <td class="py-3 px-4">
-                            <span class="px-2 py-1 rounded text-xs font-medium ${
-                                sub.disposition === 'Qualified' ? 'bg-green-100 text-green-800' :
-                                sub.disposition === 'Not Qualified' ? 'bg-red-100 text-red-800' :
-                                sub.disposition === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                sub.disposition === 'Call Back' ? 'bg-blue-100 text-blue-800' :
-                                'bg-gray-100 text-gray-800'
-                            }">
-                                ${sub.disposition || 'Unknown'}
-                            </span>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
+function renderLiveSubmissions() {
+    const tbody = document.getElementById('liveSubmissionsBody');
+    tbody.innerHTML = '';
+    
+    if (!rawSubmissionsData || !rawSubmissionsData.submissions || rawSubmissionsData.submissions.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="py-8 text-center text-gray-500">
+                    <i class="fas fa-database text-2xl mb-2 text-gray-300"></i><br>
+                    Loading live submissions...
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Debug: Check what data is coming in
+    console.log("Raw submissions data:", rawSubmissionsData);
+    console.log("Number of submissions:", rawSubmissionsData.submissions.length);
+    if (rawSubmissionsData.submissions.length > 0) {
+        console.log("First submission:", rawSubmissionsData.submissions[0]);
+    }
+    
+    const submissions = rawSubmissionsData.submissions;
+    
+    submissions.forEach((sub, index) => {
+        const rowClass = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+        
+        // FIX: Use formatPKTTime instead of formatDateTime
+        const timestamp = sub.timestamp ? formatPKTTime(sub.timestamp) : 'N/A';
+        
+        tbody.innerHTML += `
+            <tr class="${rowClass} hover:bg-blue-50 transition-colors duration-150">
+                <td class="py-3 px-4 text-xs">${timestamp}</td>
+                <td class="py-3 px-4">${sub.agent || 'Unknown'}</td>
+                <td class="py-3 px-4 text-sm">${sub.did || 'N/A'}</td>
+                <td class="py-3 px-4">${sub.state || 'N/A'}</td>
+                <td class="py-3 px-4">${sub.campaign || 'Unknown'}</td>
+                <td class="py-3 px-4">${formatDuration(sub.duration || 0)}</td>
+                <td class="py-3 px-4">
+                    <span class="px-2 py-1 rounded text-xs font-medium ${
+                        sub.disposition === 'Qualified' ? 'bg-green-100 text-green-800' :
+                        sub.disposition === 'Not Qualified' ? 'bg-red-100 text-red-800' :
+                        sub.disposition === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                        sub.disposition === 'Call Back' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
+                    }">
+                        ${sub.disposition || 'Unknown'}
+                    </span>
+                </td>
+            </tr>
+        `;
+    });
+}
 
         // Render campaigns - FIXED
         function renderCampaigns() {
