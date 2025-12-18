@@ -451,15 +451,24 @@
             });
         }
 
-        function formatDateTime(isoString) {
-            if (!isoString) return 'N/A';
-            const date = new Date(isoString);
-            return date.toLocaleString('en-US', {
-                month: 'short', day: 'numeric',
-                hour: 'numeric', minute: '2-digit',
-                hour12: true, timeZone: 'America/Los_Angeles'
-            });
-        }
+        function formatPKTTime(isoString) {
+    if (!isoString) return 'N/A';
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return 'N/A';
+        
+        return date.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            timeZone: 'Asia/Karachi'  // PKT timezone
+        });
+    } catch (e) {
+        return 'N/A';
+    }
+}
 
         function formatDuration(seconds) {
             if (!seconds) return "0:00";
