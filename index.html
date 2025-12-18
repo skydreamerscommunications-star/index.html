@@ -457,15 +457,43 @@
         const date = new Date(isoString);
         if (isNaN(date.getTime())) return 'N/A';
         
-        return date.toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true,
-            timeZone: 'Asia/Karachi'  // PKT timezone
-        });
+        // The ISO string is in UTC, convert to PKT (UTC+5)
+        const pktDate = new Date(date.getTime() + (5 * 60 * 60 * 1000));
+        
+        const month = pktDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+        const day = pktDate.getUTCDate();
+        const hour = pktDate.getUTCHours();
+        const minute = pktDate.getUTCMinutes().toString().padStart(2, '0');
+        
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour % 12 || 12; // Convert 0 to 12, 13 to 1, etc.
+        
+        return `${month} ${day}, ${displayHour}:${minute} ${ampm}`;
     } catch (e) {
+        console.error("Error formatting PKT time:", e, isoString);
+        return 'N/A';
+    }
+}
+        function formatLastSubmissionTime(isoString) {
+    if (!isoString) return 'N/A';
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return 'N/A';
+        
+        // Convert UTC to PKT
+        const pktDate = new Date(date.getTime() + (5 * 60 * 60 * 1000));
+        
+        const month = pktDate.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+        const day = pktDate.getUTCDate();
+        const hour = pktDate.getUTCHours();
+        const minute = pktDate.getUTCMinutes().toString().padStart(2, '0');
+        
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour % 12 || 12;
+        
+        return `${month} ${day}, ${displayHour}:${minute} ${ampm} PKT`;
+    } catch (e) {
+        console.error("Error formatting time:", e, isoString);
         return 'N/A';
     }
 }
@@ -615,9 +643,9 @@
             
             console.log("Rendering all data with filter:", currentFilter);
             
-            // Update time
-            document.getElementById('lastSubmissionTime').textContent = 
-                formatPKTTime(dashboardData.lastSubmission) || 'No data yet';
+            // Update this line (around line 331 in your HTML):
+document.getElementById('lastSubmissionTime').textContent = 
+    formatLastSubmissionTime(dashboardData.lastSubmission) || 'No data yet';
 
             // Update metrics with filtered data
             const filteredSummary = calculateFilteredSummary(dashboardData, currentFilter);
